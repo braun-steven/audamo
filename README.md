@@ -1,5 +1,8 @@
-# <img src='docs/res/logo.jpg' width='5%'> Auto Dark Mode
-
+<p align="center">
+ <img src='docs/res/logo.jpg' width='20%'>
+</p>
+ 
+# Auto Dark Mode
 ## Installation
 
 ### Install Script
