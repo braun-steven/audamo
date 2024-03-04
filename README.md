@@ -9,7 +9,7 @@
 
 Install conveniently with the install script.
 
-``` sh
+``` bash
 bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/auto-dark-mode/main/install.sh)
 ```
 
@@ -17,8 +17,8 @@ bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/auto-dark-mode/
 
 (TODO: Add to AUR)
 
-```sh
-paru -s auto-dark-mode
+```bash
+paru -S auto-dark-mode
 ```
 
 ## Enable Auto Dark Mode
@@ -27,7 +27,7 @@ paru -s auto-dark-mode
 
 We provide systemd user units to run `auto-dark-mode` as a service and timer. The service runs the `auto-dark-mode` script and the timer triggers the service every 10 minutes.
 
-```sh
+```bash
 systemctl --user enable --now auto-dark-mode.service
 systemctl --user enable --now auto-dark-mode.timer
 ```
@@ -36,7 +36,7 @@ systemctl --user enable --now auto-dark-mode.timer
 
 If systemd is not available or not desired, `auto-dark-mode` can also be run in daemon mode:
 
-``` sh
+``` bash
 auto-dark-mode --daemon
 ```
 
@@ -74,7 +74,7 @@ A custom script can get executed with every time `auto-dark-mode` is run. The sc
 
 An example script can be found in [`example-custom-script.sh`](example-custom-script.sh):
 
-```
+```bash
 #!/usr/bin/env sh
 
 # This is an example custom script that can be set as `custom-script-path` in the config file.
@@ -89,6 +89,6 @@ fi
 
 ## Uninstall
 
-``` sh
+``` bash
 bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/auto-dark-mode/main/uninstall.sh)
 ```
