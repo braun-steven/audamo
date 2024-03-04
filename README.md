@@ -7,7 +7,7 @@
 Install conveniently with the install script.
 
 ``` sh
-curl https://github.com/braun-steven/auto-dark-mode/install.sh | bash
+curl https://raw.githubusercontent.com/braun-steven/auto-dark-mode/main/install.sh | bash
 ```
 
 ### Arch Linux (AUR)
