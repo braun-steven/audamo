@@ -3,8 +3,17 @@
 cd $HOME
 # Clone the repository and install the script
 echo "Cloning the repository and installing the script to ~/.local/bin/auto-dark-mode"
-git clone https://github.com/braun-steven/auto-dark-mode
-cd auto-dark-mode
+
+# Check if ~/auto-darm-mode already exists. If it does, cd into the dir and run git pull
+if [ -d ~/auto-dark-mode ]; then
+  cd ~/auto-dark-mode
+  git pull
+else
+    git clone https://github.com/braun-steven/auto-dark-mode
+    cd auto-dark-mode
+fi
+
+# Ensure that ~/.local/bin exists and copy the script to it
 mkdir -p ~/.local/bin/
 cp auto_dark_mode.py ~/.local/bin/auto-dark-mode
 chmod +x ~/.local/bin/auto-dark-mode

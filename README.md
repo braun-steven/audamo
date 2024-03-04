@@ -2,6 +2,14 @@
 
 ## Installation
 
+### Install Script
+
+Install conveniently with the install script.
+
+``` sh
+curl https://github.com/braun-steven/auto-dark-mode/install.sh | bash
+```
+
 ### Arch Linux (AUR)
 
 (TODO: Add to AUR)
@@ -10,13 +18,6 @@
 paru -s auto-dark-mode
 ```
 
-### Install Script
-
-Install conveniently with the install script.
-
-``` sh
-curl https://github.com/braun-steven/auto-dark-mode/install.sh | bash
-```
 
 ## Configuration
 
