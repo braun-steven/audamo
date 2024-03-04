@@ -19,6 +19,7 @@ import os
 import tomllib
 from typing import Optional
 import enum
+from time import sleep
 
 logger = logging.getLogger(__name__)
 
@@ -169,9 +170,6 @@ def set_theme_from_time(args: argparse.Namespace, config: dict):
         logger.info("It's nighttime (sunset to sunrise)")
         set_theme(theme=Theme.DARK, config=config)
 
-    logger.info("Done!")
-    exit(0)
-
 
 def set_theme_from_location(args: argparse.Namespace, config: dict):
     if args.location:
@@ -209,9 +207,6 @@ def set_theme_from_location(args: argparse.Namespace, config: dict):
     else:
         logger.info("It's nighttime (sunset to sunrise)")
         set_theme(theme=Theme.DARK, config=config)
-
-    logger.info("Done!")
-    exit(0)
 
 
 def setup_logging(debug: bool):
@@ -278,6 +273,43 @@ def run_custom_script(script_path: str, theme: Theme):
         raise e
 
 
+def set_theme_once(args, config):
+    ##########################
+    # Set the theme manually #
+    ##########################
+    if args.light:
+        set_theme(Theme.LIGHT, config)
+    elif args.dark:
+        set_theme(Theme.DARK, config)
+    elif args.time is not None:
+        set_theme_from_time(args, config)
+    elif args.location is not None:
+        set_theme_from_location(args, config)
+    elif config["mode"] == Mode.TIME:
+        set_theme_from_time(args, config)
+    elif config["mode"] == Mode.LOCATION:
+        set_theme_from_location(args, config)
+
+
+def run_as_daemon(args, config):
+    """
+    Run the script as a daemon to continuously monitor the time and set the theme.
+
+    Args:
+        args: Command line arguments.
+        config: Configuration settings.
+    """
+    # Run as a daemon
+    try:
+        while True:
+            set_theme_once(args, config)
+            sleep(60 * 10)
+    except KeyboardInterrupt:
+        logger.info("Daemon mode interrupted.")
+        logger.info("Exiting...")
+        exit(0)
+
+
 def main():
     """Main function to parse command line arguments and set the theme."""
 
@@ -321,7 +353,9 @@ def main():
         type=lambda x: datetime.strptime(x, "%H:%M"),
         help="Manually specify sunrise and sunset times.",
     )
-
+    parser.add_argument(
+        "--daemon", action="store_true", help="Run as a daemon to continuously monitor the time."
+    )
     # Add a new argument to specify the configuration file
     parser.add_argument(
         "-c",
@@ -341,32 +375,12 @@ def main():
         logger.error("Cannot set both light and dark mode at the same time.")
         exit(1)
 
-    ##########################
-    # Set the theme manually #
-    ##########################
-    if args.light:
-        set_theme(Theme.LIGHT, config)
-        exit(0)
-
-    if args.dark:
-        set_theme(Theme.DARK, config)
-        exit(0)
-
-    if args.time is not None:
-        set_theme_from_time(args, config)
-        exit(0)
-
-    if args.location is not None:
-        set_theme_from_location(args, config)
-        exit(0)
-
-    if config["mode"] == Mode.TIME:
-        set_theme_from_time(args, config)
-        exit(0)
-
-    if config["mode"] == Mode.LOCATION:
-        set_theme_from_location(args, config)
-        exit(0)
+    if not args.daemon:
+        # Set the theme manually
+        set_theme_once(args, config)
+    else:
+        # Run as a daemon
+        run_as_daemon(args, config)
 
 
 if __name__ == "__main__":
