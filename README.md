@@ -1,4 +1,4 @@
-# Auto Dark Mode
+# ![](./docs/res/logo.jpg) Auto Dark Mode
 
 ## Installation
 
