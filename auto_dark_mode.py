@@ -15,7 +15,6 @@ import pytz
 from astral import LocationInfo
 from astral.sun import sun
 from timezonefinder import TimezoneFinder
-import colorlog
 import os
 import tomllib
 from typing import Optional
@@ -210,19 +209,11 @@ def setup_logging(debug: bool):
     Args:
         debug: Enable debug logging to console.
     """
-    stream_handler = colorlog.StreamHandler()
-    stream_handler.setFormatter(
-        colorlog.ColoredFormatter(
-            "%(log_color)s%(asctime)s [%(levelname)s] %(message_log_color)s%(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S",
-            secondary_log_colors={"message": {"INFO": "white", "ERROR": "red", "CRITICAL": "red"}},
-        ),
-    )
     logging.basicConfig(
         level=logging.DEBUG if debug else logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
         handlers=[
-            stream_handler,
+            logging.StreamHandler(),
             logging.FileHandler("/tmp/auto-dark-mode.log"),
         ],
     )
