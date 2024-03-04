@@ -140,13 +140,25 @@ def set_theme(theme: Theme, config: dict):
             run("gsettings set org.gnome.desktop.interface color-scheme prefer-light")
         else:
             raise ValueError(f"Invalid theme: {theme}")
+
+        # Run custom script if specified
+        if config["custom-script-path"] is not None and config["custom-script-path"] != "":
+            run_custom_script(config["custom-script-path"], theme)
     except Exception as e:
         logging.error("Failed to set theme: %s", e)
         raise
 
 
 def set_theme_from_time(args: argparse.Namespace, config: dict):
-    sunrise, sunset = args.time
+    # Check if args contain sunrise and sunset times
+    if args.time is not None:
+        sunrise, sunset = args.time
+    else:
+        # Obtain time from config
+        sunrise, sunset = config["sunrise"], config["sunset"]
+        sunrise = datetime.strptime(sunrise, "%H:%M")
+        sunset = datetime.strptime(sunset, "%H:%M")
+
     sunrise = sunrise.time()
     sunset = sunset.time()
     now = datetime.now().time()
@@ -204,7 +216,7 @@ def set_theme_from_location(args: argparse.Namespace, config: dict):
 
 def setup_logging(debug: bool):
     """
-    Set up basic logging. Enables stream (colorful) and file handlers.
+    Set up basic logging. Enables stream and file handlers.
 
     Args:
         debug: Enable debug logging to console.
@@ -238,6 +250,32 @@ def load_config(args_config_path: Optional[str]) -> dict:
 
     with open(path, "rb") as f:
         return tomllib.load(f)
+
+
+def run_custom_script(script_path: str, theme: Theme):
+    """
+    Run a custom script.
+
+    Args:
+        script_path: Path to the custom script to run.
+        theme: Theme mode: light or dark.
+
+    """
+    # Check if script path exists and is executable
+    script_path = os.path.expanduser(script_path)
+
+    logger.info("Running custom script: %s", script_path)
+    if not os.path.exists(script_path):
+        raise FileNotFoundError(f"Script not found: {script_path}")
+    if not os.access(script_path, os.X_OK):
+        raise PermissionError(f"Script is not executable: {script_path}")
+
+    # Run the script
+    try:
+        subprocess.run([script_path, theme], check=True)
+    except subprocess.CalledProcessError as e:
+        logging.error("Script failed: %s", e)
+        raise e
 
 
 def main():

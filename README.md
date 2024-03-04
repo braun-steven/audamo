@@ -26,7 +26,7 @@ paru -s auto-dark-mode
 latitude = ""
 longitude = ""
 
-# Time
+# Time in the format "%H:%M"
 sunrise = "08:00"
 sunset = "20:00"
 
@@ -36,12 +36,31 @@ sunset = "20:00"
 mode = "location"
 
 
-# GTK Themes
+# GTK Themes for light and dark mode
 gtk-theme-light = "Adwaita"
 gtk-theme-dark = "Adwaita-dark"
 
 
-# External script that also gets executed
-# This script may contain user specified `sed` instructions to e.g. replace the vim theme like "sed -i s/colorscheme dark/colorscheme light/g" or similar
-external-script = ""
+# Custom script that also gets executed with a single argument which is either "light" or "dark"
+# This script may contain user specified `sed` instructions to e.g. replace the vim theme like "sed -i s/colorscheme dark/colorscheme light/g ~/.vimrc" or similar
+# Make sure that the script has a proper shebang, e.g. "#!/bin/sh" for shell scripts
+custom-script-path = ""
+```
+
+## Custom Script
+
+A custom script can get executed with every time `auto-dark-mode` is run. The script path can be configured in `config.toml` with the  `custom-script-path` variable. The script is run with a single argument which is either "light" or "dark". This script may contain user specified `sed` instructions to e.g. replace the vim theme like `sed -i s/colorscheme dark/colorscheme light/g ~/.vimrc` or similar. Make sure that the script has a proper shebang, e.g. `#!/bin/sh` for shell scripts.
+
+An example script can be found in [`example-custom-script.sh`](example-custom-script.sh):
+
+```
+#!/usr/bin/env sh
+
+# This is an example custom script that can be set as `custom-script-path` in the config file.
+
+if [ "$1" = "light" ]; then
+    echo "Custom script called in light mode!"
+elif [ "$1" = "dark" ]; then
+    echo "Custom script called in dark mode!"
+fi
 ```
