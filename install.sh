@@ -35,7 +35,10 @@ if [ -f ~/.config/auto-dark-mode/config.toml ]; then
   if [ "$answer" = "y" ]; then
     cp config.toml ~/.config/auto-dark-mode/config.toml
   fi
+else
+    cp config.toml ~/.config/auto-dark-mode/config.toml
 fi
+
 
 
 # Install the systemd service and timer
