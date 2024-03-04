@@ -64,3 +64,10 @@ elif [ "$1" = "dark" ]; then
     echo "Custom script called in dark mode!"
 fi
 ```
+
+
+## Uninstall
+
+``` sh
+bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/auto-dark-mode/main/uninstall.sh)
+```
