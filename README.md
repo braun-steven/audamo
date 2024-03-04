@@ -1,4 +1,4 @@
-# ![](./docs/res/logo.jpg) Auto Dark Mode
+# <img src='docs/res/logo.jpg' width='5%'> Auto Dark Mode
 
 ## Installation
 
