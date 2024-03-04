@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "auto-dark-mode"
+authors = [
+    { name = "Steven Braun", email = "steven.braun.mz@gmail.com" },
+]
+description = "A python program to automatically set dark or light themes."
+readme = "README.md"
+license = { file = "LICENSE" }
+keywords = ["auto", "dark", "mode", "theme", "gtk", "i3wm", "sway"]
+requires-python = ">=3.9"
+classifier = [
+    "Development Status :: 4 - Beta",
+    "Environment :: X11 Applications :: GTK",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Desktop Environment",
+    "Topic :: Utilities",
+]
+urls = { Homepage = "https://github.com/braun-steven/auto-dark-mode" }
+dependencies = [
+    "astral==3.2",
+    "colorlog==6.8.2",
+    "pytz==2024.1",
+    "Requests==2.31.0",
+    "timezonefinder==6.4.1",
+]
+dynamic = ["version"]
+
+[tool.setuptools.packages]
+find = {}  # The package is discovered automatically (including the py.typed file):
+
+[tool.setuptools.dynamic]
+version = { attr = "auto_dark_mode.__version__" }
+
+[tool.pytest.ini_options]
+addopts = "--color=yes"
+testpaths = [
+    "tests",
+]
+
+[tool.black]
+line-length = 110
+color = true
+target-version = [
+    "py39",
+    "py310",
+    "py311",
+    "py312",
+]
+
+[tool.ruff]
+# See https://docs.astral.sh/ruff/rules
+select = ["E", "F", "W", "I", "N", "D", "C90", "UP", "NPY"]
+line-length = 110  # Same as Black
+target-version = "py39"  # The lowest supported version
+
+[tool.ruff.pydocstyle]
+convention = "google"
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+warn_return_any = true
+warn_unused_configs = true

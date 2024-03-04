@@ -1,0 +1,9 @@
+[Unit]
+Description=Automatically switch GTK theme based on sunrise and sunset
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python %h/.local/bin/auto-dark-mode
+
+[Install]
+WantedBy=default.target
