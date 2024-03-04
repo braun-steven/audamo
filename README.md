@@ -18,6 +18,24 @@ bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/auto-dark-mode/
 paru -s auto-dark-mode
 ```
 
+## Enable Auto Dark Mode
+
+### Systemd
+
+We provide systemd user units to run `auto-dark-mode` as a service and timer. The service runs the `auto-dark-mode` script and the timer triggers the service every 10 minutes.
+
+```sh
+systemctl --user enable --now auto-dark-mode.service
+systemctl --user enable --now auto-dark-mode.timer
+```
+
+### Daemon Mode
+
+If systemd is not available or not desired, `auto-dark-mode` can also be run in daemon mode:
+
+``` sh
+auto-dark-mode --daemon
+```
 
 ## Configuration
 
