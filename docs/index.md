@@ -78,12 +78,23 @@ audamo --daemon
 
 ### Manual
 
-Instead of using Audamo as a service/daemon, you can also run it manually with a single invokation
+Instead of using Audamo as a service/daemon, you can also run it manually with a single invocation:
 
 ``` bash
-audamo --dark          # Set theme to dark
-audamo --light         # Set theme to light
-audamo --list-themes   # List available themes
+$ audamo --help
+usage: audamo [-h] [-l] [-d] [--debug] [--list-themes] [--daemon] [-c CONFIG]
+
+Automatically set the system theme based on time or local sunrise and sunset.
+
+options:
+  -h, --help            show this help message and exit
+  -l, --light           Set theme to light mode. (default: False)
+  -d, --dark            Set theme to dark mode. (default: False)
+  --debug               Enable debug logging to console. (default: False)
+  --list-themes         List available themes, cursors, and icons. (default: False)
+  --daemon              Run as a daemon to continuously monitor the time. (default: False)
+  -c CONFIG, --config CONFIG
+                        Specify the configuration file to use (default: None)
 ```
 
 ## Configuration
