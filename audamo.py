@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 __author__ = "Steven Braun"
 __email__ = "steven.braun.mz@gmail.com"
-__version__ = "1.0.2"
+__version__ = "1.0.4"
 __license__ = "MIT"
 
 import argparse
