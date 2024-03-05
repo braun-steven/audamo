@@ -1,6 +1,6 @@
 ![Python Version](https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12-blue)
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![AUR](https://img.shields.io/aur/version/:audamo)
+![AUR](https://img.shields.io/aur/version/audamo)
 
 # Audamo
  <img align="right" src='docs/res/logo.jpg' width='20%'>
