@@ -18,11 +18,11 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Auto Dark Mode
+title: Audamo
 email: steven.braun.mz@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Auto Dark Mode description
-baseurl: "/auto-dark-mode" # the subpath of your site, e.g. /blog
+  Audamo description
+baseurl: "/audamo" # the subpath of your site, e.g. /blog
 url: "https://www.steven-braun.com" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: sbraunmz
 github_username:  braun-steven

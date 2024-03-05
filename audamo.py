@@ -6,7 +6,6 @@ and allows for manual location specification.
 """
 
 import argparse
-from dataclasses import dataclass
 import logging
 import requests
 import subprocess
@@ -16,11 +15,10 @@ from astral import LocationInfo
 from astral.sun import sun
 from timezonefinder import TimezoneFinder
 import os
-import tomllib
+from pip._vendor import tomli
 from typing import Optional
 import enum
 from time import sleep
-import pprint
 
 logger = logging.getLogger(__name__)
 
@@ -135,20 +133,24 @@ def set_theme(theme: Theme):
         if d["theme"] != "":  # Only set the theme if it's not empty
             if d["theme"] not in available_themes["theme"]:  # Check if theme exists
                 logger.warning(f"Theme not found: {d['theme']}. Must be one of: {available_themes['theme']}")
-            run(f"gsettings set org.gnome.desktop.interface gtk-theme '{d["theme"]}'")
-            run(f"gsettings set org.gnome.desktop.wm.preferences theme '{d["theme"]}'")
+
+            run(f"gsettings set org.gnome.desktop.interface gtk-theme '{d['theme']}'")
+            run(f"gsettings set org.gnome.desktop.wm.preferences theme '{d['theme']}'")
             run(f"gsettings set org.gnome.desktop.interface color-scheme prefer-{theme.value}")
 
         # ICON
         if d["icon"] != "":  # Only set the icon if it's not empty
             if d["icon"] not in available_themes["icon"]:  # Check if icon exists
                 logger.warning(f"Icon not found: {d['icon']}. Must be one of: {available_themes['icon']}")
+
             run(f"gsettings set org.gnome.desktop.interface icon-theme '{d['icon']}'")
 
         # CURSOR
         if d["cursor"] != "":  # Only set the cursor if it's not empty
             if d["cursor"] not in available_themes["cursor"]:  # Check if cursor exists
-                logger.warning(f"Cursor not found: {d['cursor']}. Must be one of: {available_themes['cursor']}")
+                logger.warning(
+                    f"Cursor not found: {d['cursor']}. Must be one of: {available_themes['cursor']}"
+                )
             run(f"gsettings set org.gnome.desktop.interface cursor-theme '{d['cursor']}'")
 
         # Run custom script if specified
@@ -157,6 +159,11 @@ def set_theme(theme: Theme):
     except Exception as e:
         logging.error("Failed to set theme: %s", e)
         raise e
+
+    # Write current theme to a temporary file
+    with open("/tmp/audamo_current-theme", "w") as f:
+        f.write(theme.value)
+
 
 def set_theme_sunrise_sunset(sunrise: datetime, sunset: datetime):
     """
@@ -178,6 +185,7 @@ def set_theme_sunrise_sunset(sunrise: datetime, sunset: datetime):
     else:
         logger.info("It's nighttime (sunset to sunrise)")
         set_theme(theme=Theme.DARK)
+
 
 def set_theme_from_time():
     """Set the theme based on the current time. Obtains the sunrise and sunset times from the config file."""
@@ -213,7 +221,6 @@ def set_theme_from_location():
     set_theme_sunrise_sunset(sunrise, sunset)
 
 
-
 def setup_logging(debug: bool):
     """
     Set up basic logging. Enables stream and file handlers.
@@ -226,7 +233,7 @@ def setup_logging(debug: bool):
         format="%(asctime)s - %(levelname)s - %(message)s",
         handlers=[
             logging.StreamHandler(),
-            logging.FileHandler("/tmp/auto-dark-mode.log"),
+            logging.FileHandler("/tmp/audamo.log"),
         ],
     )
 
@@ -244,12 +251,12 @@ def load_config(args_config_path: Optional[str]) -> dict:
     if args_config_path is None:
         # If config path is not specified, use the default path at XDG_CONFIG_HOME or ~/.config/
         config_home = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
-        path = os.path.join(config_home, "auto-dark-mode", "config.toml")
+        path = os.path.join(config_home, "audamo", "config.toml")
     else:
         path = args_config_path
 
     with open(path, "rb") as f:
-        return tomllib.load(f)
+        return tomli.load(f)
 
 
 def run_custom_script(script_path: str, theme: Theme):
@@ -355,7 +362,6 @@ def find_available_themes():
 
 
 def main(args):
-
     if args.list_themes:
         available_themes = find_available_themes()
         print("Available themes:")
@@ -363,7 +369,6 @@ def main(args):
         print("Cursors:\n- " + "\n- ".join(available_themes["cursor"]))
         print("Icons:\n- " + "\n- ".join(available_themes["icon"]))
         exit(0)
-
 
     # Check that the user didn't set both light and dark mode at the same time
     if args.light and args.dark:

@@ -2,122 +2,86 @@
 layout: default
 ---
 
-Text can be **bold**, _italic_, or ~~strikethrough~~.
+# Audamo
 
-[Link to another page](./another-page.html).
+## Installation
 
-There should be whitespace between paragraphs.
+### Install Script
 
-There should be whitespace between paragraphs. We recommend including a README, or a file with information about your project.
+Install conveniently with the install script.
 
-# Header 1
-
-This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.
-
-## Header 2
-
-> This is a blockquote following a header.
->
-> When something is important enough, you do it even if the odds are not in your favor.
-
-### Header 3
-
-```js
-// Javascript code with syntax highlighting.
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
-}
+``` sh
+bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/install.sh)
 ```
 
-```ruby
-# Ruby code with syntax highlighting
-GitHubPages::Dependencies.gems.each do |gem, version|
-  s.add_dependency(gem, "= #{version}")
-end
+### Arch Linux (AUR)
+
+(TODO: Add to AUR)
+
+```sh
+paru -s audamo
 ```
 
-#### Header 4
+## Enable Audamo
 
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
+### Systemd
 
-##### Header 5
+We provide systemd user units to run `audamo` as a service and timer. The service runs the `audamo` script and the timer triggers the service every 10 minutes.
 
-1.  This is an ordered list following a header.
-2.  This is an ordered list following a header.
-3.  This is an ordered list following a header.
-
-###### Header 6
-
-| head1        | head two          | three |
-|:-------------|:------------------|:------|
-| ok           | good swedish fish | nice  |
-| out of stock | good and plenty   | nice  |
-| ok           | good `oreos`      | hmm   |
-| ok           | good `zoute` drop | yumm  |
-
-### There's a horizontal rule below this.
-
-* * *
-
-### Here is an unordered list:
-
-*   Item foo
-*   Item bar
-*   Item baz
-*   Item zip
-
-### And an ordered list:
-
-1.  Item one
-1.  Item two
-1.  Item three
-1.  Item four
-
-### And a nested list:
-
-- level 1 item
-  - level 2 item
-  - level 2 item
-    - level 3 item
-    - level 3 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-
-### Small image
-
-![Octocat](https://github.githubassets.com/images/icons/emoji/octocat.png)
-
-### Large image
-
-![Branching](https://guides.github.com/activities/hello-world/branching.png)
-
-
-### Definition lists can be used with HTML syntax.
-
-<dl>
-<dt>Name</dt>
-<dd>Godzilla</dd>
-<dt>Born</dt>
-<dd>1952</dd>
-<dt>Birthplace</dt>
-<dd>Japan</dd>
-<dt>Color</dt>
-<dd>Green</dd>
-</dl>
-
-```
-Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.
+```sh
+systemctl --user enable --now audamo.service
+systemctl --user enable --now audamo.timer
 ```
 
+## Configuration
+
+``` toml
+# Specify location by latitude and longitude
+latitude = ""
+longitude = ""
+
+# Time in the format "%H:%M"
+sunrise = "08:00"
+sunset = "20:00"
+
+# Theme mode:
+#  - "location": sets the theme based on sunrise/sunset at given location
+#  - "time": sets the theme
+mode = "location"
+
+
+# GTK Themes for light and dark mode
+gtk-theme-light = "Adwaita"
+gtk-theme-dark = "Adwaita-dark"
+
+
+# Custom script that also gets executed with a single argument which is either "light" or "dark"
+# This script may contain user specified `sed` instructions to e.g. replace the vim theme like "sed -i s/colorscheme dark/colorscheme light/g ~/.vimrc" or similar
+# Make sure that the script has a proper shebang, e.g. "#!/bin/sh" for shell scripts
+custom-script-path = ""
 ```
-The final element.
+
+## Custom Script
+
+A custom script can get executed with every time `auto-dark-mode` is run. The script path can be configured in `config.toml` with the  `custom-script-path` variable. The script is run with a single argument which is either "light" or "dark". This script may contain user specified `sed` instructions to e.g. replace the vim theme like `sed -i s/colorscheme dark/colorscheme light/g ~/.vimrc` or similar. Make sure that the script has a proper shebang, e.g. `#!/bin/sh` for shell scripts.
+
+An example script can be found in [`example-custom-script.sh`](example-custom-script.sh):
+
+```
+#!/usr/bin/env sh
+
+# This is an example custom script that can be set as `custom-script-path` in the config file.
+
+if [ "$1" = "light" ]; then
+    echo "Custom script called in light mode!"
+elif [ "$1" = "dark" ]; then
+    echo "Custom script called in dark mode!"
+fi
+```
+
+
+## Uninstall
+
+``` sh
+bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/uninstall.sh)
 ```

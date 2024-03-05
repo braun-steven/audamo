@@ -2,21 +2,21 @@
 
 cd $HOME
 # Clone the repository and install the script
-echo "Cloning the repository and installing the script to ~/.local/bin/auto-dark-mode"
+echo "Cloning the repository and installing the script to ~/.local/bin/audamo"
 
 # Check if ~/auto-darm-mode already exists. If it does, cd into the dir and run git pull
-if [ -d ~/auto-dark-mode ]; then
-  cd ~/auto-dark-mode
+if [ -d ~/audamo ]; then
+  cd ~/audamo
   git pull
 else
-    git clone https://github.com/braun-steven/auto-dark-mode
-    cd auto-dark-mode
+    git clone https://github.com/braun-steven/audamo
+    cd audamo
 fi
 
 # Ensure that ~/.local/bin exists and copy the script to it
 mkdir -p ~/.local/bin/
-cp auto_dark_mode.py ~/.local/bin/auto-dark-mode
-chmod +x ~/.local/bin/auto-dark-mode
+cp auto_dark_mode.py ~/.local/bin/audamo
+chmod +x ~/.local/bin/audamo
 
 # Check if .local/bin is in the PATH. If not, suggest the user the command to add it to the PATH
 if ! [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
@@ -25,18 +25,18 @@ if ! [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
 fi
 
 # Install the configuration file
-echo "Installing the configuration file to ~/.config/auto-dark-mode/config.toml"
-mkdir -p ~/.config/auto-dark-mode/
+echo "Installing the configuration file to ~/.config/audamo/config.toml"
+mkdir -p ~/.config/audamo/
 
 # Check if the configuration file already exists. If it does, ask the user if they want to overwrite it
-if [ -f ~/.config/auto-dark-mode/config.toml ]; then
-  echo "The file ~/.config/auto-dark-mode/config.toml already exists. Do you want to overwrite it? (y/n)"
+if [ -f ~/.config/audamo/config.toml ]; then
+  echo "The file ~/.config/audamo/config.toml already exists. Do you want to overwrite it? (y/n)"
   read -r answer
   if [ "$answer" = "y" ]; then
-    cp config.toml ~/.config/auto-dark-mode/config.toml
+    cp config.toml ~/.config/audamo/config.toml
   fi
 else
-    cp config.toml ~/.config/auto-dark-mode/config.toml
+    cp config.toml ~/.config/audamo/config.toml
 fi
 
 
@@ -44,5 +44,5 @@ fi
 # Install the systemd service and timer
 echo "Installing systemd service and timer"
 mkdir -p ~/.config/systemd/user/
-cp auto-dark-mode.service ~/.config/systemd/user/auto-dark-mode.service
-cp auto-dark-mode.timer ~/.config/systemd/user/auto-dark-mode.timer
+cp audamo.service ~/.config/systemd/user/audamo.service
+cp audamo.timer ~/.config/systemd/user/audamo.timer

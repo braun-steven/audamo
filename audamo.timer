@@ -1,10 +1,10 @@
 [Unit]
-Description=Run auto-dark-mode script every 10 minutes
+Description=Run audamo script every 10 minutes
 
 [Timer]
 OnBootSec=5min
 OnUnitActiveSec=10min
-Unit=auto-dark-mode.service
+Unit=audamo.service
 
 [Install]
 WantedBy=timers.target 

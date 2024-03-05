@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "auto-dark-mode"
+name = "audamo"
 authors = [
     { name = "Steven Braun", email = "steven.braun.mz@gmail.com" },
 ]
@@ -22,7 +22,7 @@ classifier = [
     "Topic :: Desktop Environment",
     "Topic :: Utilities",
 ]
-urls = { Homepage = "https://github.com/braun-steven/auto-dark-mode" }
+urls = { Homepage = "https://github.com/braun-steven/audamo" }
 dependencies = [
     "astral==3.2",
     "colorlog==6.8.2",

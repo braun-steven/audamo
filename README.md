@@ -1,5 +1,5 @@
 
-# Auto Dark Mode
+# Audamo
  <img align="right" src='docs/res/logo.jpg' width='20%'>
 
 Auto Dark Mode is a project designed to smoothly provide what fully featured desktop environments such as Gnome and KDE provide: An automated transition of your system theme between light and dark. This is particularly helpful for non-desktop environments such as i3wm, sway, hyprland, awesomewm, bspwm, dwm, and more. It can be configured to switch themes based on sunrise/sunset times or a specified schedule. Additionally, Auto Dark Mode allows for the execution of custom scripts during theme changes, enabling users to personalize their experience.
@@ -13,7 +13,7 @@ Auto Dark Mode is a project designed to smoothly provide what fully featured des
 Install conveniently with the install script.
 
 ``` bash
-bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/auto-dark-mode/main/install.sh)
+bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/install.sh)
 ```
 
 ### Arch Linux (AUR)
@@ -21,26 +21,26 @@ bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/auto-dark-mode/
 (TODO: Add to AUR)
 
 ```bash
-paru -S auto-dark-mode
+paru -S audamo
 ```
 
-## Enable Auto Dark Mode
+## Enable Audamo
 
 ### Systemd
 
-We provide systemd user units to run `auto-dark-mode` as a service and timer. The service runs the `auto-dark-mode` script and the timer triggers the service every 10 minutes.
+We provide systemd user units to run `audamo` as a service and timer. The service runs the `audamo` script and the timer triggers the service every 10 minutes.
 
 ```bash
-systemctl --user enable --now auto-dark-mode.service
-systemctl --user enable --now auto-dark-mode.timer
+systemctl --user enable --now audamo.service
+systemctl --user enable --now audamo.timer
 ```
 
 ### Daemon Mode
 
-If systemd is not available or not desired, `auto-dark-mode` can also be run in daemon mode:
+If systemd is not available or not desired, `audamo` can also be run in daemon mode:
 
 ``` bash
-auto-dark-mode --daemon
+audamo --daemon
 ```
 
 ## Configuration
@@ -93,5 +93,5 @@ fi
 ## Uninstall
 
 ``` bash
-bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/auto-dark-mode/main/uninstall.sh)
+bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/uninstall.sh)
 ```
