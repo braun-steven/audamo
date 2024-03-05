@@ -3,7 +3,7 @@
 ![AUR](https://img.shields.io/aur/version/audamo)
 
 # Audamo
- <img align="right" src='docs/res/logo.jpg' width='20%'>
+ <img align="right" src='https://raw.githubusercontent.com/braun-steven/audamo/main/docs/res/logo.jpg' width='20%'>
 
 Audamo is a project designed to smoothly provide what fully featured desktop environments such as Gnome and KDE provide: An automated transition of themes between light and dark mode depending on time or location. This is particularly helpful for non-desktop environments such as i3wm, sway, hyprland, awesomewm, bspwm, dwm, and many more. Audamo can be configured to switch themes based on sunrise/sunset times at a given or inferred location or simply by a specified schedule. Additionally, Audamo allows for the execution of custom scripts during theme changes, enabling users to hook up additional scripts into the theme toggle process.
 
@@ -13,7 +13,7 @@ Audamo is a project designed to smoothly provide what fully featured desktop env
 
 ### Install Script
 
-Install conveniently with the [install script](install.sh).
+Install conveniently with the [install script](https://raw.githubusercontent.com/braun-steven/audamo/main/install.sh).
 
 ``` bash
 bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/install.sh)
@@ -21,7 +21,7 @@ bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/ins
 
 #### Dependencies
 
-Audamo requires the following python packages to be installed (see `requirements.txt` for more specific versions):
+Audamo requires the following python packages to be installed (see [requirements.txt](https://raw.githubusercontent.com/braun-steven/audamo/main/install.sh) for more specific versions):
 
 - `astral`
 - `pytz`
@@ -79,6 +79,7 @@ Audamo can be configured by editing the `config.toml` file. The user configurati
 
 ``` toml
 # Specify location by latitude and longitude
+[general]
 latitude = ""
 longitude = ""
 
@@ -91,16 +92,24 @@ sunset = "20:00"
 #  - "time": sets the theme
 mode = "location"
 
-
-# GTK Themes for light and dark mode
-gtk-theme-light = "Adwaita"
-gtk-theme-dark = "Adwaita-dark"
-
-
 # Custom script that also gets executed with a single argument which is either "light" or "dark"
 # This script may contain user specified `sed` instructions to e.g. replace the vim theme like "sed -i s/colorscheme dark/colorscheme light/g ~/.vimrc" or similar
 # Make sure that the script has a proper shebang, e.g. "#!/bin/sh" for shell scripts
 custom-script-path = ""
+
+# Light theme elements
+# Set values to "" if they should not be changed
+[light]
+theme="Adwaita"
+icon="Adwaita"
+cursor="Adwaita"
+
+# Dark theme elements
+# Set values to "" if they should not be changed
+[dark]
+theme="Adwaita-dark"
+icon="Adwaita"
+cursor="Adwaita"
 ```
 
 ## Custom Script
@@ -124,7 +133,7 @@ fi
 
 ## Uninstall
 
-If Audamo was installed via the [install script](install.sh), it can be uninstalled with the [uninstall script](uninstall.sh):
+If Audamo was installed via the [install script](https://raw.githubusercontent.com/braun-steven/audamo/main/install.sh), it can likewise be uninstalled with the [uninstall script](https://raw.githubusercontent.com/braun-steven/audamo/main/uninstall.sh):
 
 ``` bash
 bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/uninstall.sh)

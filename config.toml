@@ -1,4 +1,5 @@
 # Specify location by latitude and longitude
+[general]
 latitude = ""
 longitude = ""
 

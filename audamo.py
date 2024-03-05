@@ -154,8 +154,11 @@ def set_theme(theme: Theme):
             run(f"gsettings set org.gnome.desktop.interface cursor-theme '{d['cursor']}'")
 
         # Run custom script if specified
-        if CONFIG["custom-script-path"] is not None and CONFIG["custom-script-path"] != "":
-            run_custom_script(CONFIG["custom-script-path"], theme)
+        if (
+            CONFIG["general"]["custom-script-path"] is not None
+            and CONFIG["general"]["custom-script-path"] != ""
+        ):
+            run_custom_script(CONFIG["general"]["custom-script-path"], theme)
     except Exception as e:
         logging.error("Failed to set theme: %s", e)
         raise e
@@ -190,7 +193,7 @@ def set_theme_sunrise_sunset(sunrise: datetime, sunset: datetime):
 def set_theme_from_time():
     """Set the theme based on the current time. Obtains the sunrise and sunset times from the config file."""
     # Obtain time from config
-    sunrise, sunset = CONFIG["sunrise"], CONFIG["sunset"]
+    sunrise, sunset = CONFIG["general"]["sunrise"], CONFIG["general"]["sunset"]
     sunrise = datetime.strptime(sunrise, "%H:%M")
     sunset = datetime.strptime(sunset, "%H:%M")
 
@@ -202,9 +205,9 @@ def set_theme_from_location():
     Set the theme based on the current location. Obtains the sunrise and sunset times from the current
     location or the config specified location.
     """
-    if CONFIG["latitude"] != "" and CONFIG["longitude"] != "":
+    if CONFIG["general"]["latitude"] != "" and CONFIG["general"]["longitude"] != "":
         # Else, if location was specified in the config file
-        latitude, longitude = float(CONFIG["latitude"]), float(CONFIG["longitude"])
+        latitude, longitude = float(CONFIG["general"]["latitude"]), float(CONFIG["general"]["longitude"])
         timezone_str = location_to_timezone(latitude, longitude)
     else:
         # Else, fetch the current location
@@ -300,9 +303,9 @@ def set_theme_once():
     ##########################
     # Set the theme manually #
     ##########################
-    if CONFIG["mode"] == Mode.TIME:
+    if CONFIG["general"]["mode"] == Mode.TIME:
         set_theme_from_time()
-    elif CONFIG["mode"] == Mode.LOCATION:
+    elif CONFIG["general"]["mode"] == Mode.LOCATION:
         set_theme_from_location()
 
 
