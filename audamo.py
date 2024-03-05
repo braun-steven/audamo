@@ -252,6 +252,17 @@ def load_config(args_config_path: Optional[str]) -> dict:
         # If config path is not specified, use the default path at XDG_CONFIG_HOME or ~/.config/
         config_home = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
         path = os.path.join(config_home, "audamo", "config.toml")
+
+        if not os.path.exists(path):
+            logger.warning(
+                "No config file found at %s, using system config at /usr/share/audamo/config.toml", path
+            )
+
+        # Set new default path
+        path = "/usr/share/audamo/config.toml"
+        if not os.path.exists(path):
+            logger.error("No system config file found at %s, exiting now.", path)
+            exit(0)
     else:
         path = args_config_path
 
