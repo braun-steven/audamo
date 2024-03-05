@@ -106,6 +106,7 @@ def run(cmd):
         subprocess.CalledProcessError: If the command fails.
     """
     try:
+        logger.info("Running command: %s", cmd)
         subprocess.run(cmd.split(), check=True)
     except subprocess.CalledProcessError as e:
         logging.error("Command failed: %s", e)
