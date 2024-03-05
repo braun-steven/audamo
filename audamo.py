@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""
-Enhanced script to automatically change the GNOME theme between light and dark mode
-based on the sunrise and sunset times. Now includes improved error handling, logging,
-and allows for manual location specification.
-"""
+__author__ = "Steven Braun"
+__email__ = "steven.braun.mz@gmail.com"
+__version__ = "1.0.2"
+__license__ = "MIT"
 
 import argparse
 import logging
@@ -439,6 +438,12 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--daemon", action="store_true", help="Run as a daemon to continuously monitor the time."
+    )
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version=f"audamo {__version__}",
     )
     # Add a new argument to specify the configuration file
     parser.add_argument(

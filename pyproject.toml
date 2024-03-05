@@ -36,7 +36,7 @@ dynamic = ["version"]
 find = {}  # The package is discovered automatically (including the py.typed file):
 
 [tool.setuptools.dynamic]
-version = { attr = "auto_dark_mode.__version__" }
+version = { attr = "audamo.__version__" }
 
 [tool.pytest.ini_options]
 addopts = "--color=yes"
