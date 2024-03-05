@@ -127,14 +127,29 @@ def set_theme(theme: Theme):
     """
 
     logger.info("Setting theme to %s mode", theme)
+    available_themes = find_available_themes()
     try:
         d = CONFIG[theme.value]
 
-        run(f"gsettings set org.gnome.desktop.interface gtk-theme '{d["theme"]}'")
-        run(f"gsettings set org.gnome.desktop.wm.preferences theme '{d["theme"]}'")
-        run(f"gsettings set org.gnome.desktop.interface icon-theme '{d['icon']}'")
-        run(f"gsettings set org.gnome.desktop.interface cursor-theme '{d['cursor']}'")
-        run(f"gsettings set org.gnome.desktop.interface color-scheme prefer-{theme.value}")
+        # THEME
+        if d["theme"] != "":  # Only set the theme if it's not empty
+            if d["theme"] not in available_themes["theme"]:  # Check if theme exists
+                logger.warning(f"Theme not found: {d['theme']}. Must be one of: {available_themes['theme']}")
+            run(f"gsettings set org.gnome.desktop.interface gtk-theme '{d["theme"]}'")
+            run(f"gsettings set org.gnome.desktop.wm.preferences theme '{d["theme"]}'")
+            run(f"gsettings set org.gnome.desktop.interface color-scheme prefer-{theme.value}")
+
+        # ICON
+        if d["icon"] != "":  # Only set the icon if it's not empty
+            if d["icon"] not in available_themes["icon"]:  # Check if icon exists
+                logger.warning(f"Icon not found: {d['icon']}. Must be one of: {available_themes['icon']}")
+            run(f"gsettings set org.gnome.desktop.interface icon-theme '{d['icon']}'")
+
+        # CURSOR
+        if d["cursor"] != "":  # Only set the cursor if it's not empty
+            if d["cursor"] not in available_themes["cursor"]:  # Check if cursor exists
+                logger.warning(f"Cursor not found: {d['cursor']}. Must be one of: {available_themes['cursor']}")
+            run(f"gsettings set org.gnome.desktop.interface cursor-theme '{d['cursor']}'")
 
         # Run custom script if specified
         if CONFIG["custom-script-path"] is not None and CONFIG["custom-script-path"] != "":
