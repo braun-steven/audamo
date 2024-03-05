@@ -19,11 +19,11 @@ custom-script-path = ""
 # Light theme elements
 [light]
 theme="Adwaita"
-icon=""
-cursor=""
+icon="Adwaita"
+cursor="Adwaita"
 
 # Dark theme elements
 [dark]
 theme="Adwaita-dark"
-icon=""
-cursor=""
+icon="Adwaita"
+cursor="Adwaita"
