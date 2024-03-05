@@ -2,7 +2,7 @@
 # Audamo
  <img align="right" src='docs/res/logo.jpg' width='20%'>
 
-Auto Dark Mode is a project designed to smoothly provide what fully featured desktop environments such as Gnome and KDE provide: An automated transition of your system theme between light and dark. This is particularly helpful for non-desktop environments such as i3wm, sway, hyprland, awesomewm, bspwm, dwm, and more. It can be configured to switch themes based on sunrise/sunset times or a specified schedule. Additionally, Auto Dark Mode allows for the execution of custom scripts during theme changes, enabling users to personalize their experience.
+Audamo is a project designed to smoothly provide what fully featured desktop environments such as Gnome and KDE provide: An automated transition of your system theme between light and dark. This is particularly helpful for non-desktop environments such as i3wm, sway, hyprland, awesomewm, bspwm, dwm, and more. It can be configured to switch themes based on sunrise/sunset times or a specified schedule. Additionally, Audamo allows for the execution of custom scripts during theme changes, enabling users to personalize their experience.
 
 </br>
 
@@ -73,7 +73,7 @@ custom-script-path = ""
 
 ## Custom Script
 
-A custom script can get executed with every time `auto-dark-mode` is run. The script path can be configured in `config.toml` with the  `custom-script-path` variable. The script is run with a single argument which is either "light" or "dark". This script may contain user specified `sed` instructions to e.g. replace the vim theme like `sed -i s/colorscheme dark/colorscheme light/g ~/.vimrc` or similar. Make sure that the script has a proper shebang, e.g. `#!/bin/sh` for shell scripts.
+A custom script can get executed with every time `audamo` is run. The script path can be configured in `config.toml` with the  `custom-script-path` variable. The script is run with a single argument which is either "light" or "dark". This script may contain user specified `sed` instructions to e.g. replace the vim theme like `sed -i s/colorscheme dark/colorscheme light/g ~/.vimrc` or similar. Make sure that the script has a proper shebang, e.g. `#!/bin/sh` for shell scripts.
 
 An example script can be found in [`example-custom-script.sh`](example-custom-script.sh):
 
