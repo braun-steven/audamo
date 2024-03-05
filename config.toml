@@ -11,13 +11,19 @@ sunset = "20:00"
 #  - "time": sets the theme
 mode = "location"
 
-
-# GTK Themes for light and dark mode
-gtk-theme-light = "Adwaita"
-gtk-theme-dark = "Adwaita-dark"
-
-
 # Custom script that also gets executed with a single argument which is either "light" or "dark"
 # This script may contain user specified `sed` instructions to e.g. replace the vim theme like "sed -i s/colorscheme dark/colorscheme light/g ~/.vimrc" or similar
 # Make sure that the script has a proper shebang, e.g. "#!/bin/sh" for shell scripts
 custom-script-path = ""
+
+# Light theme elements
+[light]
+theme="Adwaita"
+icon=""
+cursor=""
+
+# Dark theme elements
+[dark]
+theme="Adwaita-dark"
+icon=""
+cursor=""

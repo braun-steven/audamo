@@ -20,11 +20,11 @@ import tomllib
 from typing import Optional
 import enum
 from time import sleep
+import pprint
 
 logger = logging.getLogger(__name__)
 
 
-# Theme enum
 class Theme(str, enum.Enum):
     LIGHT = "light"
     DARK = "dark"
@@ -115,13 +115,12 @@ def run(cmd):
         raise
 
 
-def set_theme(theme: Theme, config: dict):
+def set_theme(theme: Theme):
     """
     Set the theme based on the mode.
 
     Args:
         theme: Theme mode: light or dark.
-        config: Configuration settings.
 
     Raises:
         Exception: If an error occurs while setting the theme.
@@ -129,56 +128,60 @@ def set_theme(theme: Theme, config: dict):
 
     logger.info("Setting theme to %s mode", theme)
     try:
-        dark_theme = config["gtk-theme-dark"]
-        light_theme = config["gtk-theme-light"]
-        if theme == Theme.DARK:
-            run(f"gsettings set org.gnome.desktop.interface gtk-theme '{dark_theme}'")
-            run(f"gsettings set org.gnome.desktop.wm.preferences theme '{dark_theme}'")
-            run("gsettings set org.gnome.desktop.interface color-scheme prefer-dark")
-        elif theme == Theme.LIGHT:
-            run(f"gsettings set org.gnome.desktop.interface gtk-theme '{light_theme}'")
-            run(f"gsettings set org.gnome.desktop.wm.preferences theme '{light_theme}'")
-            run("gsettings set org.gnome.desktop.interface color-scheme prefer-light")
-        else:
-            raise ValueError(f"Invalid theme: {theme}")
+        d = CONFIG[theme.value]
+
+        run(f"gsettings set org.gnome.desktop.interface gtk-theme '{d["theme"]}'")
+        run(f"gsettings set org.gnome.desktop.wm.preferences theme '{d["theme"]}'")
+        run(f"gsettings set org.gnome.desktop.interface icon-theme '{d['icon']}'")
+        run(f"gsettings set org.gnome.desktop.interface cursor-theme '{d['cursor']}'")
+        run(f"gsettings set org.gnome.desktop.interface color-scheme prefer-{theme.value}")
 
         # Run custom script if specified
-        if config["custom-script-path"] is not None and config["custom-script-path"] != "":
-            run_custom_script(config["custom-script-path"], theme)
+        if CONFIG["custom-script-path"] is not None and CONFIG["custom-script-path"] != "":
+            run_custom_script(CONFIG["custom-script-path"], theme)
     except Exception as e:
         logging.error("Failed to set theme: %s", e)
-        raise
+        raise e
 
+def set_theme_sunrise_sunset(sunrise: datetime, sunset: datetime):
+    """
+    Set the theme based on the sunrise and sunset times.
 
-def set_theme_from_time(args: argparse.Namespace, config: dict):
-    # Check if args contain sunrise and sunset times
-    if args.time is not None:
-        sunrise, sunset = args.time
-    else:
-        # Obtain time from config
-        sunrise, sunset = config["sunrise"], config["sunset"]
-        sunrise = datetime.strptime(sunrise, "%H:%M")
-        sunset = datetime.strptime(sunset, "%H:%M")
+    Args:
+        sunrise: Datetime object for the sunrise time.
+        sunset: Datetime object for the sunset time.
+    """
+    now = datetime.now()
 
-    sunrise = sunrise.time()
-    sunset = sunset.time()
-    now = datetime.now().time()
-    if sunrise <= now <= sunset:
+    logger.info("Sunrise:      %s", sunrise.strftime("%H:%M:%S %Z"))
+    logger.info("Sunset:       %s", sunset.strftime("%H:%M:%S %Z"))
+    logger.info("Current time: %s", now.strftime("%H:%M:%S %Z"))
+
+    if sunrise.time() <= now.time() <= sunset.time():
         logger.info("It's daytime (sunrise to sunset)")
-        set_theme(theme=Theme.LIGHT, config=config)
+        set_theme(theme=Theme.LIGHT)
     else:
         logger.info("It's nighttime (sunset to sunrise)")
-        set_theme(theme=Theme.DARK, config=config)
+        set_theme(theme=Theme.DARK)
+
+def set_theme_from_time():
+    """Set the theme based on the current time. Obtains the sunrise and sunset times from the config file."""
+    # Obtain time from config
+    sunrise, sunset = CONFIG["sunrise"], CONFIG["sunset"]
+    sunrise = datetime.strptime(sunrise, "%H:%M")
+    sunset = datetime.strptime(sunset, "%H:%M")
+
+    set_theme_sunrise_sunset(sunrise, sunset)
 
 
-def set_theme_from_location(args: argparse.Namespace, config: dict):
-    if args.location:
-        # If location was explicitly specified in cmd-line arguments
-        latitude, longitude = float(args.location[0]), float(args.location[1])
-        timezone_str = location_to_timezone(latitude, longitude)
-    elif config["latitude"] != "" and config["longitude"] != "":
+def set_theme_from_location():
+    """
+    Set the theme based on the current location. Obtains the sunrise and sunset times from the current
+    location or the config specified location.
+    """
+    if CONFIG["latitude"] != "" and CONFIG["longitude"] != "":
         # Else, if location was specified in the config file
-        latitude, longitude = float(config["latitude"]), float(config["longitude"])
+        latitude, longitude = float(CONFIG["latitude"]), float(CONFIG["longitude"])
         timezone_str = location_to_timezone(latitude, longitude)
     else:
         # Else, fetch the current location
@@ -186,27 +189,14 @@ def set_theme_from_location(args: argparse.Namespace, config: dict):
         latitude, longitude, timezone_str = get_current_location_info()
 
     # Get timezone, sunrise, sunset, and current time
-    timezone = pytz.timezone(timezone_str)
     sunrise, sunset = get_sunrise_sunset(latitude, longitude, timezone_str)
-    now = datetime.now(timezone)
 
     # Print some info
     logger.info("Location: latitude=%s, longitude=%s", latitude, longitude)
     logger.info("Timezone: %s", timezone_str)
-    logger.info("Sunrise:      %s", sunrise.strftime("%H:%M:%S %Z"))
-    logger.info("Sunset:       %s", sunset.strftime("%H:%M:%S %Z"))
-    logger.info("Current time: %s", now.strftime("%H:%M:%S %Z"))
 
-    current_time = now.time()
-    sunrise_time = sunrise.time()
-    sunset_time = sunset.time()
+    set_theme_sunrise_sunset(sunrise, sunset)
 
-    if sunrise_time <= current_time <= sunset_time:
-        logger.info("It's daytime (sunrise to sunset)")
-        set_theme(theme=Theme.LIGHT, config=config)
-    else:
-        logger.info("It's nighttime (sunset to sunrise)")
-        set_theme(theme=Theme.DARK, config=config)
 
 
 def setup_logging(debug: bool):
@@ -273,36 +263,27 @@ def run_custom_script(script_path: str, theme: Theme):
         raise e
 
 
-def set_theme_once(args, config):
+def set_theme_once():
     ##########################
     # Set the theme manually #
     ##########################
-    if args.light:
-        set_theme(Theme.LIGHT, config)
-    elif args.dark:
-        set_theme(Theme.DARK, config)
-    elif args.time is not None:
-        set_theme_from_time(args, config)
-    elif args.location is not None:
-        set_theme_from_location(args, config)
-    elif config["mode"] == Mode.TIME:
-        set_theme_from_time(args, config)
-    elif config["mode"] == Mode.LOCATION:
-        set_theme_from_location(args, config)
+    if CONFIG["mode"] == Mode.TIME:
+        set_theme_from_time()
+    elif CONFIG["mode"] == Mode.LOCATION:
+        set_theme_from_location()
 
 
-def run_as_daemon(args, config):
+def run_as_daemon():
     """
     Run the script as a daemon to continuously monitor the time and set the theme.
 
     Args:
         args: Command line arguments.
-        config: Configuration settings.
     """
     # Run as a daemon
     try:
         while True:
-            set_theme_once(args, config)
+            set_theme_once()
             sleep(60 * 10)
     except KeyboardInterrupt:
         logger.info("Daemon mode interrupted.")
@@ -310,9 +291,87 @@ def run_as_daemon(args, config):
         exit(0)
 
 
-def main():
-    """Main function to parse command line arguments and set the theme."""
+def find_available_themes():
+    """Returns a dictionary containing lists of available themes, cursors, and icons.
 
+    Searches directories specified in the XDG_DATA_DIRS environment variable
+    as well as $HOME/.themes and $HOME/.icons.
+    """
+
+    result = {"theme": [], "cursor": [], "icon": []}
+    xdg_data_dirs = os.environ.get("XDG_DATA_DIRS", "/usr/local/share:/usr/share").split(":")
+    theme_dirs = [os.path.join(d, "themes") for d in xdg_data_dirs] + [
+        os.path.join(os.path.expanduser("~"), ".themes")
+    ]
+    icon_dirs = [os.path.join(d, "icons") for d in xdg_data_dirs] + [
+        os.path.join(os.path.expanduser("~"), ".icons")
+    ]
+    cursor_dirs = icon_dirs
+
+    # Themes
+    for themes_dir in theme_dirs:
+        if os.path.exists(themes_dir):
+            for theme_candidate in os.listdir(themes_dir):
+                full_theme_path = os.path.join(themes_dir, theme_candidate)
+                if os.path.isdir(full_theme_path) and "index.theme" in os.listdir(full_theme_path):
+                    result["theme"].append(theme_candidate)
+
+    # Icons
+    for icon_dir in icon_dirs:
+        if os.path.exists(icon_dir):
+            for icon_candidate in os.listdir(icon_dir):
+                full_icon_path = os.path.join(icon_dir, icon_candidate)
+                if os.path.isdir(full_icon_path):
+                    result["icon"].append(icon_candidate)
+
+    # Cursors
+    for cursor_dir in cursor_dirs:
+        if os.path.exists(cursor_dir):
+            for cursor_candidate in os.listdir(cursor_dir):
+                full_cursor_path = os.path.join(cursor_dir, cursor_candidate)
+                if os.path.isdir(full_cursor_path):
+                    result["cursor"].append(cursor_candidate)
+
+    # Make sure there are no duplicates and sort lists
+    for key in result:
+        result[key] = sorted(list(set(result[key])))
+
+    return result
+
+
+def main(args):
+
+    if args.list_themes:
+        available_themes = find_available_themes()
+        print("Available themes:")
+        print("Themes:\n- " + "\n- ".join(available_themes["theme"]))
+        print("Cursors:\n- " + "\n- ".join(available_themes["cursor"]))
+        print("Icons:\n- " + "\n- ".join(available_themes["icon"]))
+        exit(0)
+
+
+    # Check that the user didn't set both light and dark mode at the same time
+    if args.light and args.dark:
+        logger.error("Cannot set both light and dark mode at the same time.")
+        exit(1)
+
+    # Check if the user set light or dark mode manually
+    if args.light:
+        set_theme(Theme.LIGHT)
+        exit(0)
+    elif args.dark:
+        set_theme(Theme.DARK)
+        exit(0)
+
+    if not args.daemon:
+        # Set the theme manually
+        set_theme_once()
+    else:
+        # Run as a daemon
+        run_as_daemon()
+
+
+if __name__ == "__main__":
     ###############################
     # Parse commandline arguments #
     ###############################
@@ -338,21 +397,12 @@ def main():
         action="store_true",
         help="Enable debug logging to console.",
     )
+    parser.add_argument(
+        "--list-themes",
+        action="store_true",
+        help="List available themes, cursors, and icons.",
+    )
 
-    parser.add_argument(
-        "--location",
-        nargs=2,
-        metavar=("LATITUDE", "LONGITUDE"),
-        type=float,
-        help="Manually specify location as latitude and longitude.",
-    )
-    parser.add_argument(
-        "--time",
-        nargs=2,
-        metavar=("SUNRISE", "SUNSET"),
-        type=lambda x: datetime.strptime(x, "%H:%M"),
-        help="Manually specify sunrise and sunset times.",
-    )
     parser.add_argument(
         "--daemon", action="store_true", help="Run as a daemon to continuously monitor the time."
     )
@@ -368,20 +418,6 @@ def main():
     setup_logging(args.debug)
 
     # Parse the configuration file
-    config = load_config(args.config)
+    CONFIG = load_config(args.config)
 
-    # Check that the user didn't set both light and dark mode at the same time
-    if args.light and args.dark:
-        logger.error("Cannot set both light and dark mode at the same time.")
-        exit(1)
-
-    if not args.daemon:
-        # Set the theme manually
-        set_theme_once(args, config)
-    else:
-        # Run as a daemon
-        run_as_daemon(args, config)
-
-
-if __name__ == "__main__":
-    main()
+    main(args)
