@@ -7,7 +7,7 @@ layout: default
 ![AUR](https://img.shields.io/aur/version/audamo)
 
 # Audamo
- <img align="right" src='https://raw.githubusercontent.com/braun-steven/audamo/main/docs/res/logo.jpg' width='20%'>
+ <img align="right" src='https://raw.githubusercontent.com/braun-steven/audamo/main/docs/res/logo.png' width='20%'>
 
 Audamo is a project designed to smoothly provide what fully featured desktop environments such as Gnome and KDE provide: An automated transition of themes between light and dark mode depending on time or location. This is particularly helpful for non-desktop environments such as i3wm, sway, hyprland, awesomewm, bspwm, dwm, and many more. Audamo can be configured to switch themes based on sunrise/sunset times at a given or inferred location or simply by a specified schedule. Additionally, Audamo allows for the execution of custom scripts during theme changes, enabling users to hook up additional scripts into the theme toggle process.
 
