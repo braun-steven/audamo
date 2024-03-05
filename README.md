@@ -1,3 +1,6 @@
+![Python Version](https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12-blue)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![AUR](https://img.shields.io/aur/version/:audamo)
 
 # Audamo
  <img align="right" src='docs/res/logo.jpg' width='20%'>
@@ -16,15 +19,32 @@ Install conveniently with the install script.
 bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/install.sh)
 ```
 
+#### Dependencies
+
+Audamo requires the following python packages to be installed (see `requirements.txt` for more specific versions):
+
+- `astral`
+- `pytz`
+- `requests`
+- `timezonefinder`
+
 ### Arch Linux (AUR)
 
-(TODO: Add to AUR)
+Audamo is available in the AUR as `audamo`:
 
 ```bash
 paru -S audamo
 ```
 
-## Enable Audamo
+You can now copy the default system-wide configuration into your user config:
+
+``` bash
+cp /usr/share/audamo/config.toml $XDG_CONFIG_HOME/audamo/config.toml
+```
+
+## Usage
+
+Audamo is intended to be run as a background process which checks for location or time and based on this applies a dark or light settings defined in `config.toml`. 
 
 ### Systemd
 
@@ -41,6 +61,16 @@ If systemd is not available or not desired, `audamo` can also be run in daemon m
 
 ``` bash
 audamo --daemon
+```
+
+### Manual
+
+Instead of using Audamo as a service/daemon, you can also run it manually with a single invokation
+
+``` bash
+audamo --dark          # Set theme to dark
+audamo --light         # Set theme to light
+audamo --list-themes   # List available themes
 ```
 
 ## Configuration
