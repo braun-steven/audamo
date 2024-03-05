@@ -260,11 +260,11 @@ def load_config(args_config_path: Optional[str]) -> dict:
                 "No config file found at %s, using system config at /usr/share/audamo/config.toml", path
             )
 
-        # Set new default path
-        path = "/usr/share/audamo/config.toml"
-        if not os.path.exists(path):
-            logger.error("No system config file found at %s, exiting now.", path)
-            exit(0)
+            # Set new default path
+            path = "/usr/share/audamo/config.toml"
+            if not os.path.exists(path):
+                logger.error("No system config file found at %s, exiting now.", path)
+                exit(0)
     else:
         path = args_config_path
 
