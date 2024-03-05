@@ -5,7 +5,7 @@
 # Audamo
  <img align="right" src='docs/res/logo.jpg' width='20%'>
 
-Audamo is a project designed to smoothly provide what fully featured desktop environments such as Gnome and KDE provide: An automated transition of your system theme between light and dark. This is particularly helpful for non-desktop environments such as i3wm, sway, hyprland, awesomewm, bspwm, dwm, and more. It can be configured to switch themes based on sunrise/sunset times or a specified schedule. Additionally, Audamo allows for the execution of custom scripts during theme changes, enabling users to personalize their experience.
+Audamo is a project designed to smoothly provide what fully featured desktop environments such as Gnome and KDE provide: An automated transition of themes between light and dark mode depending on time or location. This is particularly helpful for non-desktop environments such as i3wm, sway, hyprland, awesomewm, bspwm, dwm, and many more. Audamo can be configured to switch themes based on sunrise/sunset times at a given or inferred location or simply by a specified schedule. Additionally, Audamo allows for the execution of custom scripts during theme changes, enabling users to hook up additional scripts into the theme toggle process.
 
 </br>
 
@@ -13,7 +13,7 @@ Audamo is a project designed to smoothly provide what fully featured desktop env
 
 ### Install Script
 
-Install conveniently with the install script.
+Install conveniently with the [install script](install.sh).
 
 ``` bash
 bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/install.sh)
@@ -75,6 +75,8 @@ audamo --list-themes   # List available themes
 
 ## Configuration
 
+Audamo can be configured by editing the `config.toml` file. The user configuration should be placed at `$XDG_CONFIG_HOME/audamo/config.toml`.
+
 ``` toml
 # Specify location by latitude and longitude
 latitude = ""
@@ -121,6 +123,8 @@ fi
 
 
 ## Uninstall
+
+If Audamo was installed via the [install script](install.sh), it can be uninstalled with the [uninstall script](uninstall.sh):
 
 ``` bash
 bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/uninstall.sh)
