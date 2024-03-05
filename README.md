@@ -7,6 +7,15 @@
 
 Audamo is a project designed to smoothly provide what fully featured desktop environments such as Gnome and KDE provide: An automated transition of themes between light and dark mode depending on time or location. This is particularly helpful for non-desktop environments such as i3wm, sway, hyprland, awesomewm, bspwm, dwm, and many more. Audamo can be configured to switch themes based on sunrise/sunset times at a given or inferred location or simply by a specified schedule. Additionally, Audamo allows for the execution of custom scripts during theme changes, enabling users to hook up additional scripts into the theme toggle process.
 
+Until now, Audamo can set the following theme elements (`config.toml` values in brackets, see also [Configuration](#configuration)):
+
+- GTK theme (`theme`)
+- Icon theme (`icon`)
+- Cursor theme (`cursor`)
+- GTK color-scheme preference
+
+A user specified script (`custom-script-path`) can be run with every theme change, allowing for additional customization, see also [Custom Script](#custom-script).
+
 </br>
 
 ## Installation
