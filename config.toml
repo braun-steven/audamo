@@ -17,12 +17,14 @@ mode = "location"
 custom-script-path = ""
 
 # Light theme elements
+# Set values to "" if they should not be changed
 [light]
 theme="Adwaita"
 icon="Adwaita"
 cursor="Adwaita"
 
 # Dark theme elements
+# Set values to "" if they should not be changed
 [dark]
 theme="Adwaita-dark"
 icon="Adwaita"
