@@ -1,8 +1,11 @@
-<p align="center">
- <img src='docs/res/logo.jpg' width='20%'>
-</p>
- 
+
 # Auto Dark Mode
+ <img align="right" src='docs/res/logo.jpg' width='20%'>
+
+Auto Dark Mode is a project designed to smoothly provide what fully featured desktop environments such as Gnome and KDE provide: An automated transition of your system theme between light and dark. It can be configured to switch themes based on sunrise/sunset times or a specified schedule. Additionally, Auto Dark Mode allows for the execution of custom scripts during theme changes, enabling users to personalize their experience.
+
+</br>
+
 ## Installation
 
 ### Install Script
