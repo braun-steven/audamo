@@ -38,7 +38,7 @@ $silver-chalice: #d8dee9;
 
 $body-background: $cod-grey !default;
 $body-foreground: $gallery !default;
-$header: $nord6 !default;
+$header: $nord14 !default;
 $blockquote-color: $silver-chalice !default;
 $blockquote-border: $dove-grey !default;
 $container-max-width: 1000px;
@@ -207,7 +207,7 @@ dt {
 }
 
 ul li {
-  list-style-image:url('../images/bullet.png');
+    list-style-image: none;
 }
 
 blockquote {
@@ -233,7 +233,7 @@ code.highlighter-rouge {
   border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 0px 3px;
   margin: 0px -3px;
-  color: #aa759f;
+  color: $nord4;
   border-radius: 2px;
 }
 
