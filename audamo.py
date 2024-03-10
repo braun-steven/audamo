@@ -348,7 +348,7 @@ def find_available_themes():
         if os.path.exists(themes_dir):
             for theme_candidate in os.listdir(themes_dir):
                 full_theme_path = os.path.join(themes_dir, theme_candidate)
-                if os.path.isdir(full_theme_path) and "index.theme" in os.listdir(full_theme_path):
+                if os.path.isdir(full_theme_path):
                     result["theme"].append(theme_candidate)
 
     # Icons
