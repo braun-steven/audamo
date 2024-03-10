@@ -37,9 +37,8 @@ bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/ins
 Audamo requires the following python packages to be installed (see [requirements.txt](https://raw.githubusercontent.com/braun-steven/audamo/main/install.sh) for more specific versions):
 
 - `astral`
-- `pytz`
 - `requests`
-- `timezonefinder`
+- `tomli`
 
 ### Arch Linux (AUR)
 
@@ -77,23 +76,25 @@ audamo --daemon
 
 ### Manual
 
-Instead of using Audamo as a service/daemon, you can also run it manually with a single invocation:
+Instead of using Audamo as a service/daemon, you can also run it manually with a single invocation. Based on the `config.toml` settings, this will update the theme to light/dark mode:
 
 ``` bash
 $ audamo --help
-usage: audamo [-h] [-l] [-d] [--debug] [--list-themes] [--daemon] [-c CONFIG]
+usage: audamo [-h] [-l] [-d] [--debug] [--list-themes] [--daemon] [-v] [-c CONFIG] [--print-config]
 
 Automatically set the system theme based on time or local sunrise and sunset.
 
 options:
   -h, --help            show this help message and exit
-  -l, --light           Set theme to light mode. (default: False)
-  -d, --dark            Set theme to dark mode. (default: False)
+  -l, --light           Force theme to light mode. (default: False)
+  -d, --dark            Force theme to dark mode. (default: False)
   --debug               Enable debug logging to console. (default: False)
   --list-themes         List available themes, cursors, and icons. (default: False)
   --daemon              Run as a daemon to continuously monitor the time. (default: False)
+  -v, --version         show program's version number and exit
   -c CONFIG, --config CONFIG
                         Specify the configuration file to use (default: None)
+  --print-config        Print the configuration file and exit. (default: False)
 ```
 
 ## Configuration
@@ -161,3 +162,14 @@ If Audamo was installed via the [install script](https://raw.githubusercontent.c
 ``` bash
 bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/uninstall.sh)
 ```
+
+## Changelog
+
+### Version 1.1.0
+
+- Add print config flag
+- Implement sleep until next sunrise/sunset
+- Fix theme detection when theme do not have an `index.theme` file
+- Rewrite core logic
+- Get rid of timezonefinder dependency
+- Remove systemd timer and make the service start the daemon

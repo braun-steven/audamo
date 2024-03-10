@@ -76,7 +76,7 @@ Instead of using Audamo as a service/daemon, you can also run it manually with a
 
 ``` bash
 $ audamo --help
-usage: audamo [-h] [-l] [-d] [--debug] [--list-themes] [--daemon] [-c CONFIG]
+usage: audamo [-h] [-l] [-d] [--debug] [--list-themes] [--daemon] [-v] [-c CONFIG] [--print-config]
 
 Automatically set the system theme based on time or local sunrise and sunset.
 
@@ -87,8 +87,10 @@ options:
   --debug               Enable debug logging to console. (default: False)
   --list-themes         List available themes, cursors, and icons. (default: False)
   --daemon              Run as a daemon to continuously monitor the time. (default: False)
+  -v, --version         show program's version number and exit
   -c CONFIG, --config CONFIG
                         Specify the configuration file to use (default: None)
+  --print-config        Print the configuration file and exit. (default: False)
 ```
 
 ## Configuration
