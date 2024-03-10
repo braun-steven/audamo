@@ -61,11 +61,10 @@ Audamo is intended to be run as a background process which checks for location o
 
 ### Systemd
 
-We provide systemd user units to run `audamo` as a service and timer. The service runs the `audamo` script and the timer triggers the service every 10 minutes.
+We provide systemd user units to run `audamo --daemon` as a serviced service as well:
 
 ```bash
 systemctl --user enable --now audamo.service
-systemctl --user enable --now audamo.timer
 ```
 
 ### Daemon Mode

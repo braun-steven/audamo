@@ -3,7 +3,7 @@ Description=Automatically switch GTK theme based on sunrise and sunset
 
 [Service]
 Type=oneshot
-ExecStart=audamo
+ExecStart=audamo --daemon
 
 [Install]
 WantedBy=default.target
