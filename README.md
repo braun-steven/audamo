@@ -165,5 +165,5 @@ bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/uni
 - Implement sleep until next sunrise/sunset
 - Fix theme detection when theme do not have an `index.theme` file
 - Rewrite core logic
-- Get rid of timezonfinder dependency
+- Get rid of timezonefinder dependency
 - Remove systemd timer and make the service start the daemon
