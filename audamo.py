@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 __author__ = "Steven Braun"
 __email__ = "steven.braun.mz@gmail.com"
-__version__ = "1.0.5"
+__version__ = "1.1.0"
 __license__ = "MIT"
 
 import argparse
@@ -9,19 +9,16 @@ import logging
 import requests
 import subprocess
 from datetime import datetime
-from zoneinfo import ZoneInfo
-from timezonefinder import TimezoneFinder
+
 from astral import LocationInfo
 from astral.sun import sun
 import os
-from pip._vendor import tomli
+import tomli
 from typing import Optional
 import enum
 from time import sleep
 
 logger = logging.getLogger(__name__)
-
-tf = TimezoneFinder()
 
 
 class Theme(str, enum.Enum):
@@ -34,23 +31,90 @@ class Mode(str, enum.Enum):
     LOCATION = "location"
 
 
-def location_to_timezone(latitude: float, longitude: float) -> str:
+def get_sunrise_sunset(cfg: dict) -> tuple[datetime, datetime]:
     """
-    Get the timezone for a given location using the timezonefinder library.
+    Get the sunrise and sunset times based on the mode.
 
     Args:
-        latitude: Latitude of the location.
-        longitude: Longitude of the location.
+        cfg: Configuration settings.
 
     Returns:
-        str: Timezone string for the given location.
+        tuple: Datetime objects for the sunrise and sunset times.
     """
 
-    timezone_str = tf.timezone_at(lng=longitude, lat=latitude)
-    return timezone_str
+    if cfg["general"]["mode"] == Mode.TIME:
+        # Get sunrise and sunset times from config
+        logger.info("Using sunrise and sunset times from config")
+        sunrise, sunset = get_sunrise_sunset_from_config(cfg)
+
+    elif cfg["general"]["mode"] == Mode.LOCATION:
+        # Get sunrise and sunset times from location
+        logger.info("Using sunrise and sunset times from location")
+        sunrise, sunset = get_sunrise_sunset_from_location(cfg)
+
+    else:
+        raise ValueError(f"Invalid mode: {cfg['general']['mode']}")
+
+    # Construct sunrise and sunset for today
+    now = datetime.now().astimezone()
+    sunrise = now.replace(hour=sunrise.hour, minute=sunrise.minute, second=0, microsecond=0)
+    sunset = now.replace(hour=sunset.hour, minute=sunset.minute, second=0, microsecond=0)
+    return sunrise, sunset
 
 
-def get_current_location_info() -> tuple[float, float, str]:
+def get_sunrise_sunset_from_location(cfg: dict) -> tuple[datetime, datetime]:
+    """
+    Get the sunrise and sunset times for a given location.
+
+    Args:
+        cfg: Configuration settings.
+
+    Returns:
+        tuple: Datetime objects for the sunrise and sunset times.
+
+    Raises:
+        Exception: If an error occurs while calculating the sunrise and sunset times.
+    """
+
+    try:
+        if lat_lon_is_missing(cfg):
+            # fetch the current location
+            logger.info("Fetching current location...")
+            latitude, longitude = get_current_location_info()
+        else:
+            # Else, if location was specified in the config file
+            latitude, longitude = float(cfg["general"]["latitude"]), float(cfg["general"]["longitude"])
+
+        city = LocationInfo(latitude=latitude, longitude=longitude)
+        s = sun(city.observer)
+        return s["sunrise"], s["sunset"]
+    except Exception as e:
+        logging.error("Error calculating sunrise/sunset: %s", e)
+        raise
+
+
+def get_sunrise_sunset_from_config(cfg: dict) -> tuple[datetime, datetime]:
+    """
+    Get the sunrise and sunset times from the configuration file.
+
+    Args:
+        cfg: Configuration settings.
+
+    Returns:
+        tuple: Datetime objects for the sunrise and sunset times.
+    """
+
+    # Get sunrise and sunset times from config
+    try:
+        sunrise = datetime.strptime(cfg["general"]["sunrise"], "%H:%M")
+        sunset = datetime.strptime(cfg["general"]["sunset"], "%H:%M")
+        return sunrise, sunset
+    except ValueError as e:
+        logging.error("Error parsing sunrise/sunset from config: %s", e)
+        raise
+
+
+def get_current_location_info() -> tuple[float, float]:
     """
     Get the current location and timezone using the ipinfo.io API.
 
@@ -65,35 +129,23 @@ def get_current_location_info() -> tuple[float, float, str]:
         response.raise_for_status()  # Raises an HTTPError if the response was an error
         data = response.json()
         loc = data["loc"].split(",")
-        return float(loc[0]), float(loc[1]), data["timezone"]
+        return float(loc[0]), float(loc[1])
     except requests.RequestException as e:
         logging.error("Failed to fetch current location: %s", e)
         raise SystemExit("Could not determine current location. Please specify location manually.")
 
 
-def get_sunrise_sunset(latitude: float, longitude: float, timezone_str: str) -> tuple[datetime, datetime]:
+def lat_lon_is_missing(cfg: dict) -> bool:
     """
-    Get the sunrise and sunset times for a given location.
+    Check if latitude and longitude are missing in the configuration file.
 
     Args:
-        latitude: Latitude of the location.
-        longitude: Longitude of the location.
-        timezone_str: Timezone string for the location.
+        cfg: Configuration settings.
 
     Returns:
-        tuple: Datetime objects for the sunrise and sunset times.
-
-    Raises:
-        Exception: If an error occurs while calculating the sunrise and sunset times.
+        bool: True if latitude and longitude are missing, False otherwise.
     """
-    try:
-        timezone = ZoneInfo(timezone_str)
-        city = LocationInfo(latitude=latitude, longitude=longitude, timezone=timezone_str)
-        s = sun(city.observer, date=datetime.now(timezone), tzinfo=timezone)
-        return s["sunrise"], s["sunset"]
-    except Exception as e:
-        logging.error("Error calculating sunrise/sunset: %s", e)
-        raise
+    return cfg["general"]["latitude"] == "" or cfg["general"]["longitude"] == ""
 
 
 def run(cmd):
@@ -114,7 +166,7 @@ def run(cmd):
         raise
 
 
-def set_theme(theme: Theme):
+def set_theme(cfg: dict, theme: Theme):
     """
     Set the theme based on the mode.
 
@@ -128,7 +180,7 @@ def set_theme(theme: Theme):
     logger.info("Setting theme to %s mode", theme)
     available_themes = find_available_themes()
     try:
-        d = CONFIG[theme.value]
+        d = cfg[theme.value]
 
         # THEME
         if d["theme"] != "":  # Only set the theme if it's not empty
@@ -155,11 +207,8 @@ def set_theme(theme: Theme):
             run(f"gsettings set org.gnome.desktop.interface cursor-theme '{d['cursor']}'")
 
         # Run custom script if specified
-        if (
-            CONFIG["general"]["custom-script-path"] is not None
-            and CONFIG["general"]["custom-script-path"] != ""
-        ):
-            run_custom_script(CONFIG["general"]["custom-script-path"], theme)
+        if cfg["general"]["custom-script-path"] is not None and cfg["general"]["custom-script-path"] != "":
+            run_custom_script(cfg["general"]["custom-script-path"], theme)
     except Exception as e:
         logging.error("Failed to set theme: %s", e)
         raise e
@@ -169,14 +218,19 @@ def set_theme(theme: Theme):
         f.write(theme.value)
 
 
-def set_theme_sunrise_sunset(sunrise: datetime, sunset: datetime):
+def set_theme_once(cfg: dict):
     """
     Set the theme based on the sunrise and sunset times.
 
+    Based on the selected mode, these can be inferred from the configuration file or calculated based on the location.
+
     Args:
-        sunrise: Datetime object for the sunrise time.
-        sunset: Datetime object for the sunset time.
+        cfg: Configuration settings.
+
+    Raises:
+        Exception: If an error occurs while setting the theme.
     """
+    sunrise, sunset = get_sunrise_sunset(cfg)
     now = datetime.now()
 
     logger.info("Sunrise:      %s", sunrise.strftime("%H:%M:%S %Z"))
@@ -185,44 +239,10 @@ def set_theme_sunrise_sunset(sunrise: datetime, sunset: datetime):
 
     if sunrise.time() <= now.time() <= sunset.time():
         logger.info("It's daytime (sunrise to sunset)")
-        set_theme(theme=Theme.LIGHT)
+        set_theme(cfg=cfg, theme=Theme.LIGHT)
     else:
         logger.info("It's nighttime (sunset to sunrise)")
-        set_theme(theme=Theme.DARK)
-
-
-def set_theme_from_time():
-    """Set the theme based on the current time. Obtains the sunrise and sunset times from the config file."""
-    # Obtain time from config
-    sunrise, sunset = CONFIG["general"]["sunrise"], CONFIG["general"]["sunset"]
-    sunrise = datetime.strptime(sunrise, "%H:%M")
-    sunset = datetime.strptime(sunset, "%H:%M")
-
-    set_theme_sunrise_sunset(sunrise, sunset)
-
-
-def set_theme_from_location():
-    """
-    Set the theme based on the current location. Obtains the sunrise and sunset times from the current
-    location or the config specified location.
-    """
-    if CONFIG["general"]["latitude"] != "" and CONFIG["general"]["longitude"] != "":
-        # Else, if location was specified in the config file
-        latitude, longitude = float(CONFIG["general"]["latitude"]), float(CONFIG["general"]["longitude"])
-        timezone_str = location_to_timezone(latitude, longitude)
-    else:
-        # Else, fetch the current location
-        logger.info("Fetching current location...")
-        latitude, longitude, timezone_str = get_current_location_info()
-
-    # Get timezone, sunrise, sunset, and current time
-    sunrise, sunset = get_sunrise_sunset(latitude, longitude, timezone_str)
-
-    # Print some info
-    logger.info("Location: latitude=%s, longitude=%s", latitude, longitude)
-    logger.info("Timezone: %s", timezone_str)
-
-    set_theme_sunrise_sunset(sunrise, sunset)
+        set_theme(cfg=cfg, theme=Theme.DARK)
 
 
 def setup_logging(debug: bool):
@@ -242,19 +262,10 @@ def setup_logging(debug: bool):
     )
 
 
-def load_config(args_config_path: Optional[str]) -> dict:
-    """
-    Load the configuration file.
-
-    Args:
-        args_config_path: Path to the configuration file.
-
-    Returns:
-        dict: Configuration settings.
-    """
+def get_config_path(args_config_path: Optional[str]) -> str:
     if args_config_path is None:
-        # If config path is not specified, use the default path at XDG_CONFIG_HOME or ~/.config/
-        config_home = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
+        # If config path is not specified, use the default path at XDG_cfg_HOME or ~/.config/
+        config_home = os.getenv("XDG_cfg_HOME", os.path.expanduser("~/.config"))
         path = os.path.join(config_home, "audamo", "config.toml")
 
         if not os.path.exists(path):
@@ -270,6 +281,21 @@ def load_config(args_config_path: Optional[str]) -> dict:
     else:
         path = args_config_path
 
+    return path
+
+
+def load_config(args_config_path: Optional[str]) -> dict:
+    """
+    Load the configuration file.
+
+    Args:
+        args_config_path: Path to the configuration file.
+
+    Returns:
+        dict: Configuration settings.
+    """
+
+    path = get_config_path(args_config_path)
     with open(path, "rb") as f:
         return tomli.load(f)
 
@@ -300,14 +326,24 @@ def run_custom_script(script_path: str, theme: Theme):
         raise e
 
 
-def set_theme_once():
-    ##########################
-    # Set the theme manually #
-    ##########################
-    if CONFIG["general"]["mode"] == Mode.TIME:
-        set_theme_from_time()
-    elif CONFIG["general"]["mode"] == Mode.LOCATION:
-        set_theme_from_location()
+def calculate_sleep_seconds(cfg: dict) -> int:
+    # Get sunrise and sunset times
+    sunrise, sunset = get_sunrise_sunset(cfg)
+
+    # Calculate sleep time
+    now = datetime.now().astimezone()
+    if now.time() < sunrise.time():
+        # If it's before sunrise, calculate sleep time until sunrise
+        sleep_seconds = (sunrise - now).seconds
+    elif now.time() > sunset.time():
+        # If it's after sunset, calculate sleep time until next day's sunrise
+        tomorrow = now.replace(day=now.day + 1)
+        sleep_seconds = (sunrise - now).seconds
+    else:
+        # If it's between sunrise and sunset, calculate sleep time until sunset
+        sleep_seconds = (sunset - now).seconds
+
+    return sleep_seconds
 
 
 def run_as_daemon():
@@ -320,8 +356,26 @@ def run_as_daemon():
     # Run as a daemon
     try:
         while True:
-            set_theme_once()
-            sleep(60 * 10)
+            # Load configuration file again in case it was changed during runtime
+            cfg = load_config(None)
+            set_theme_once(cfg)
+
+            # Get sleep time
+            sleep_seconds = calculate_sleep_seconds(cfg)
+
+            # Log time until next theme change in hours, minutes and seconds
+            logger.info(
+                "Sleeping for %d hours, %d minutes, and %d seconds until next theme change",
+                sleep_seconds // 3600,
+                (sleep_seconds % 3600) // 60,
+                sleep_seconds % 60,
+            )
+
+            # Wait for another 10 seconds just to make sure that we are not setting the theme too early
+            sleep_seconds += 10
+
+            # Sleep until next sunrise/sunset
+            sleep(sleep_seconds)
     except KeyboardInterrupt:
         logger.info("Daemon mode interrupted.")
         logger.info("Exiting...")
@@ -376,13 +430,24 @@ def find_available_themes():
     return result
 
 
+def list_themes():
+    available_themes = find_available_themes()
+    print("Available themes:")
+    print("Themes:\n- " + "\n- ".join(available_themes["theme"]))
+    print("Cursors:\n- " + "\n- ".join(available_themes["cursor"]))
+    print("Icons:\n- " + "\n- ".join(available_themes["icon"]))
+
+
 def main(args):
+    # Print the configuration file and exit
+    if args.print_config:
+        with open(get_config_path(args.config), "r") as f:
+            print(f.read())
+        exit(0)
+
+    # List available themes, cursors, and icons
     if args.list_themes:
-        available_themes = find_available_themes()
-        print("Available themes:")
-        print("Themes:\n- " + "\n- ".join(available_themes["theme"]))
-        print("Cursors:\n- " + "\n- ".join(available_themes["cursor"]))
-        print("Icons:\n- " + "\n- ".join(available_themes["icon"]))
+        list_themes()
         exit(0)
 
     # Check that the user didn't set both light and dark mode at the same time
@@ -390,20 +455,23 @@ def main(args):
         logger.error("Cannot set both light and dark mode at the same time.")
         exit(1)
 
+    # Parse the configuration file
+    cfg = load_config(args.config)
+
     # Check if the user set light or dark mode manually
     if args.light:
-        set_theme(Theme.LIGHT)
+        set_theme(cfg, Theme.LIGHT)
         exit(0)
     elif args.dark:
-        set_theme(Theme.DARK)
+        set_theme(cfg, Theme.DARK)
         exit(0)
 
-    if not args.daemon:
-        # Set the theme manually
-        set_theme_once()
-    else:
+    if args.daemon:
         # Run as a daemon
         run_as_daemon()
+    else:
+        # Set the theme manually
+        set_theme_once(cfg)
 
 
 if __name__ == "__main__":
@@ -418,13 +486,13 @@ if __name__ == "__main__":
         "-l",
         "--light",
         action="store_true",
-        help="Set theme to light mode.",
+        help="Force theme to light mode.",
     )
     parser.add_argument(
         "-d",
         "--dark",
         action="store_true",
-        help="Set theme to dark mode.",
+        help="Force theme to dark mode.",
     )
 
     parser.add_argument(
@@ -455,10 +523,14 @@ if __name__ == "__main__":
         type=lambda x: (os.path.exists(x) and x) or parser.error(f"File does not exist: {x}"),
     )
 
+    parser.add_argument(
+        "--print-config",
+        action="store_true",
+        help="Print the configuration file and exit.",
+    )
+
     args = parser.parse_args()
     setup_logging(args.debug)
 
-    # Parse the configuration file
-    CONFIG = load_config(args.config)
-
+    # Run main function
     main(args)
