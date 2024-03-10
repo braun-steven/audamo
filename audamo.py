@@ -10,7 +10,7 @@ import requests
 import subprocess
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from tzwhere import tzwhere
+from timezonefinder import TimezoneFinder
 from astral import LocationInfo
 from astral.sun import sun
 import os
@@ -20,6 +20,8 @@ import enum
 from time import sleep
 
 logger = logging.getLogger(__name__)
+
+tf = TimezoneFinder()
 
 
 class Theme(str, enum.Enum):
@@ -43,8 +45,8 @@ def location_to_timezone(latitude: float, longitude: float) -> str:
     Returns:
         str: Timezone string for the given location.
     """
-    tz = tzwhere.tzwhere()
-    timezone_str = tz.tzNameAt(latitude, longitude)
+
+    timezone_str = tf.timezone_at(lng=longitude, lat=latitude)
     return timezone_str
 
 
