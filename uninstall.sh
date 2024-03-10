@@ -24,7 +24,6 @@ fi
 # Remove systemd service and timer files
 if [ -d ~/.config/systemd/user ]; then
     rm -f ~/.config/systemd/user/audamo.service
-    rm -f ~/.config/systemd/user/audamo.timer
     echo "Removed systemd service and timer files."
 fi
 

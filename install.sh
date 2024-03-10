@@ -42,7 +42,6 @@ fi
 
 
 # Install the systemd service and timer
-echo "Installing systemd service and timer"
+echo "Installing systemd service"
 mkdir -p ~/.config/systemd/user/
 cp audamo.service ~/.config/systemd/user/audamo.service
-cp audamo.timer ~/.config/systemd/user/audamo.timer
