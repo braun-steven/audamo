@@ -10,9 +10,9 @@ import requests
 import subprocess
 from datetime import datetime
 import pytz
+from tzwhere import tzwhere
 from astral import LocationInfo
 from astral.sun import sun
-from timezonefinder import TimezoneFinder
 import os
 from pip._vendor import tomli
 from typing import Optional
@@ -43,9 +43,8 @@ def location_to_timezone(latitude: float, longitude: float) -> str:
     Returns:
         str: Timezone string for the given location.
     """
-    tf = TimezoneFinder()
-
-    timezone_str = tf.timezone_at(lng=longitude, lat=latitude)
+    tz = tzwhere.tzwhere()
+    timezone_str = tz.tzNameAt(latitude, longitude)
     return timezone_str
 
 

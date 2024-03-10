@@ -1,4 +1,4 @@
 astral==3.2
 pytz==2024.1
 Requests==2.31.0
-timezonefinder==6.4.1
+tzwhere==3.0.3
