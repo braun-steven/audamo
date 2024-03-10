@@ -4,7 +4,7 @@ cd $HOME
 # Clone the repository and install the script
 echo "Cloning the repository and installing the script to ~/.local/bin/audamo"
 
-# Check if ~/auto-darm-mode already exists. If it does, cd into the dir and run git pull
+# Check if ~/audamo already exists. If it does, cd into the dir and run git pull
 if [ -d ~/audamo ]; then
   cd ~/audamo
   git pull
@@ -15,7 +15,7 @@ fi
 
 # Ensure that ~/.local/bin exists and copy the script to it
 mkdir -p ~/.local/bin/
-cp auto_dark_mode.py ~/.local/bin/audamo
+cp audamo.py ~/.local/bin/audamo
 chmod +x ~/.local/bin/audamo
 
 # Check if .local/bin is in the PATH. If not, suggest the user the command to add it to the PATH
