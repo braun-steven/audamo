@@ -9,7 +9,7 @@ import logging
 import requests
 import subprocess
 from datetime import datetime
-import pytz
+from zoneinfo import ZoneInfo
 from tzwhere import tzwhere
 from astral import LocationInfo
 from astral.sun import sun
@@ -85,7 +85,7 @@ def get_sunrise_sunset(latitude: float, longitude: float, timezone_str: str) -> 
         Exception: If an error occurs while calculating the sunrise and sunset times.
     """
     try:
-        timezone = pytz.timezone(timezone_str)
+        timezone = ZoneInfo(timezone_str)
         city = LocationInfo(latitude=latitude, longitude=longitude, timezone=timezone_str)
         s = sun(city.observer, date=datetime.now(timezone), tzinfo=timezone)
         return s["sunrise"], s["sunset"]
