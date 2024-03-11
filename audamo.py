@@ -326,26 +326,6 @@ def run_custom_script(script_path: str, theme: Theme):
         raise e
 
 
-def calculate_sleep_seconds(cfg: dict) -> int:
-    # Get sunrise and sunset times
-    sunrise, sunset = get_sunrise_sunset(cfg)
-
-    # Calculate sleep time
-    now = datetime.now().astimezone()
-    if now.time() < sunrise.time():
-        # If it's before sunrise, calculate sleep time until sunrise
-        sleep_seconds = (sunrise - now).seconds
-    elif now.time() > sunset.time():
-        # If it's after sunset, calculate sleep time until next day's sunrise
-        tomorrow = now.replace(day=now.day + 1)
-        sleep_seconds = (sunrise - now).seconds
-    else:
-        # If it's between sunrise and sunset, calculate sleep time until sunset
-        sleep_seconds = (sunset - now).seconds
-
-    return sleep_seconds
-
-
 def run_as_daemon():
     """
     Run the script as a daemon to continuously monitor the time and set the theme.
@@ -360,19 +340,8 @@ def run_as_daemon():
             cfg = load_config(None)
             set_theme_once(cfg)
 
-            # Get sleep time
-            sleep_seconds = calculate_sleep_seconds(cfg)
-
-            # Log time until next theme change in hours, minutes and seconds
-            logger.info(
-                "Sleeping for %d hours, %d minutes, and %d seconds until next theme change",
-                sleep_seconds // 3600,
-                (sleep_seconds % 3600) // 60,
-                sleep_seconds % 60,
-            )
-
-            # Wait for another 10 seconds just to make sure that we are not setting the theme too early
-            sleep_seconds += 10
+            # Sleep for 10 minutes
+            sleep_seconds += 60 * 10
 
             # Sleep until next sunrise/sunset
             sleep(sleep_seconds)
