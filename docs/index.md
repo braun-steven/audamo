@@ -165,6 +165,10 @@ bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/uni
 
 ## Changelog
 
+### Version 1.1.2
+
+- Hot fix slip of syntax error
+
 ### Version 1.1.1
 
 - Remove sleep until next sunrise/sunset as this was not compatible with suspending systems

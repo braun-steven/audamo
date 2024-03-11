@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 __author__ = "Steven Braun"
 __email__ = "steven.braun.mz@gmail.com"
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 __license__ = "MIT"
 
 import argparse
@@ -341,7 +341,7 @@ def run_as_daemon():
             set_theme_once(cfg)
 
             # Sleep for 10 minutes
-            sleep_seconds += 60 * 10
+            sleep_seconds = 60 * 10
 
             # Sleep until next sunrise/sunset
             sleep(sleep_seconds)
