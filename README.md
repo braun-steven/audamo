@@ -161,6 +161,10 @@ bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/uni
 
 ## Changelog
 
+### Version 1.1.3
+
+- Fix a timezone bug for sunrise/sunset
+
 ### Version 1.1.2
 
 - Hot fix slip of syntax error
