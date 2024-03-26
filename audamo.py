@@ -5,18 +5,19 @@ __version__ = "1.1.2"
 __license__ = "MIT"
 
 import argparse
+import calendar
+import enum
 import logging
-import requests
+import os
 import subprocess
 from datetime import datetime
+from time import sleep
+from typing import Optional
 
+import requests
+import tomli
 from astral import LocationInfo
 from astral.sun import sun
-import os
-import tomli
-from typing import Optional
-import enum
-from time import sleep
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,19 @@ class Theme(str, enum.Enum):
 class Mode(str, enum.Enum):
     TIME = "time"
     LOCATION = "location"
+
+
+def utc_to_local_datetime(datetime_utc: datetime) -> datetime:
+    """
+    Convert a UTC datetime to a local datetime.
+
+    Args:
+        utc_dt: UTC datetime object.
+
+    Returns:
+        datetime: Local datetime object.
+    """
+    return datetime.fromtimestamp(calendar.timegm(datetime_utc.timetuple()))
 
 
 def get_sunrise_sunset(cfg: dict) -> tuple[datetime, datetime]:
@@ -54,6 +68,10 @@ def get_sunrise_sunset(cfg: dict) -> tuple[datetime, datetime]:
 
     else:
         raise ValueError(f"Invalid mode: {cfg['general']['mode']}")
+
+    # Convert UTC to local time
+    sunrise = utc_to_local_datetime(sunrise)
+    sunset = utc_to_local_datetime(sunset)
 
     # Construct sunrise and sunset for today
     now = datetime.now().astimezone()
@@ -129,6 +147,9 @@ def get_current_location_info() -> tuple[float, float]:
         response.raise_for_status()  # Raises an HTTPError if the response was an error
         data = response.json()
         loc = data["loc"].split(",")
+        logging.info(
+            f"Current location -- city: {data['city']}, region: {data['region']}, country: {data['country']}, lat: {loc[0]}, lon: {loc[1]}"
+        )
         return float(loc[0]), float(loc[1])
     except requests.RequestException as e:
         logging.error("Failed to fetch current location: %s", e)
