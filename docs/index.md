@@ -165,6 +165,10 @@ bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/uni
 
 ## Changelog
 
+### Version 1.1.4
+
+- Add fallbacks to location fetching and config parsing logic
+
 ### Version 1.1.3
 
 - Fix a timezone bug for sunrise/sunset
