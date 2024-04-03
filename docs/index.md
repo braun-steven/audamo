@@ -56,7 +56,7 @@ cp /usr/share/audamo/config.toml $XDG_CONFIG_HOME/audamo/config.toml
 
 ## Usage
 
-Audamo is intended to be run as a background process which checks for location or time and based on this applies a dark or light settings defined in `config.toml`. 
+Audamo is intended to be run as a background process that checks for location or time and, based on this, applies dark or light settings defined in `config.toml`.
 
 ### Systemd
 
