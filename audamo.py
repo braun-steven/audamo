@@ -31,6 +31,10 @@ class Mode(str, enum.Enum):
     TIME = "time"
     LOCATION = "location"
 
+class LocationError(Exception):
+    """Raised when an error occurs while fetching the location."""
+    pass
+
 
 def utc_to_local_datetime(datetime_utc: datetime) -> datetime:
     """
@@ -56,18 +60,20 @@ def get_sunrise_sunset(cfg: dict) -> tuple[datetime, datetime]:
         tuple: Datetime objects for the sunrise and sunset times.
     """
 
-    if cfg["general"]["mode"] == Mode.TIME:
+    has_location_error = False
+    if cfg["general"]["mode"] == Mode.LOCATION:
+        try:
+            # Get sunrise and sunset times from location
+            logger.info("Using sunrise and sunset times from location")
+            sunrise, sunset = get_sunrise_sunset_from_location(cfg)
+        except LocationError as e:
+            logger.error("Error fetching location: %s", e)
+            has_location_error = True
+
+    if cfg["general"]["mode"] == Mode.TIME or has_location_error:
         # Get sunrise and sunset times from config
         logger.info("Using sunrise and sunset times from config")
         sunrise, sunset = get_sunrise_sunset_from_config(cfg)
-
-    elif cfg["general"]["mode"] == Mode.LOCATION:
-        # Get sunrise and sunset times from location
-        logger.info("Using sunrise and sunset times from location")
-        sunrise, sunset = get_sunrise_sunset_from_location(cfg)
-
-    else:
-        raise ValueError(f"Invalid mode: {cfg['general']['mode']}")
 
     # Convert UTC to local time
     sunrise = utc_to_local_datetime(sunrise)
@@ -94,21 +100,34 @@ def get_sunrise_sunset_from_location(cfg: dict) -> tuple[datetime, datetime]:
         Exception: If an error occurs while calculating the sunrise and sunset times.
     """
 
-    try:
-        if lat_lon_is_missing(cfg):
+    # First try see if location was specified in the config file
+    has_parsing_error = False
+    if not lat_lon_is_missing(cfg):
+        lat_cfg, lon_cfg = cfg["general"]["latitude"], cfg["general"]["longitude"]
+        try:
+            # Try parsing the location
+            latitude, longitude = float(lat_cfg), float(lon_cfg)
+        except ValueError as e:
+            logger.warning(f"Could not parse latitude ('f{lat_cfg}') and longitude ('f{lon_cfg}') from config.")
+            logger.warning(f"Fetching current location instead...")
+            has_parsing_error = True
+
+    # If lat/lon was not specified or it was specified incorrectly
+    if lat_lon_is_missing(cfg) or has_parsing_error:
+        try:
             # fetch the current location
             logger.info("Fetching current location...")
             latitude, longitude = get_current_location_info()
-        else:
-            # Else, if location was specified in the config file
-            latitude, longitude = float(cfg["general"]["latitude"]), float(cfg["general"]["longitude"])
+        except Exception as e:
+            logging.error("Error fetching current location: %s", e)
+            logging.error("Falling back to specified time in config file.")
+            raise
 
-        city = LocationInfo(latitude=latitude, longitude=longitude)
-        s = sun(city.observer)
-        return s["sunrise"], s["sunset"]
-    except Exception as e:
-        logging.error("Error calculating sunrise/sunset: %s", e)
-        raise
+    # Get sunrise and sunset times
+    city = LocationInfo(latitude=latitude, longitude=longitude)
+    s = sun(city.observer)
+    return s["sunrise"], s["sunset"]
+
 
 
 def get_sunrise_sunset_from_config(cfg: dict) -> tuple[datetime, datetime]:
@@ -152,8 +171,8 @@ def get_current_location_info() -> tuple[float, float]:
         )
         return float(loc[0]), float(loc[1])
     except requests.RequestException as e:
-        logging.error("Failed to fetch current location: %s", e)
-        raise SystemExit("Could not determine current location. Please specify location manually.")
+        logging.warning("Failed to fetch current location: %s", e)
+        raise e
 
 
 def lat_lon_is_missing(cfg: dict) -> bool:
@@ -166,7 +185,7 @@ def lat_lon_is_missing(cfg: dict) -> bool:
     Returns:
         bool: True if latitude and longitude are missing, False otherwise.
     """
-    return cfg["general"]["latitude"] == "" or cfg["general"]["longitude"] == ""
+    return cfg["general"]["latitude"].strip() == "" or cfg["general"]["longitude"].strip() == ""
 
 
 def run(cmd):
