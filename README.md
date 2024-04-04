@@ -145,10 +145,24 @@ An example script can be found in [`example-custom-script.sh`](example-custom-sc
 THEME="$1"
 case $THEME in
     light)
-        swaymsg "output * bg ~/wallpaper-light.png fill"
+        # Sway background
+        swaymsg "output * bg ~/lakesidedeer-light.png fill"
+
+        # Alacritty
+        sed -i 's/nord/github_light/g' ~/.config/alacritty/alacritty.toml
+
+        # Vim
+        sed -i 's/background=dark/background=light/g' ~/.vimrc
         ;;
     dark)
-        swaymsg "output * bg ~/wallpaper-dark.png fill"
+        # Sway background
+        swaymsg "output * bg ~/lakesidedeer-dark.png fill"
+
+        # Alacritty
+        sed -i 's/github_light/nord/g' ~/.config/alacritty/alacritty.toml
+
+        # Vim
+        sed -i 's/background=light/background=dark/g' ~/.vimrc
         ;;
     *)
         echo "Invalid argument. Please use 'light' or 'dark'."
