@@ -7,14 +7,14 @@
 
 Audamo is a project designed to smoothly provide what fully featured desktop environments such as Gnome and KDE provide: An automated transition of themes between light and dark mode depending on time or location. This is particularly helpful for non-desktop environments such as i3wm, sway, hyprland, awesomewm, bspwm, dwm, and many more. Audamo can be configured to switch themes based on sunrise/sunset times at a given or inferred location or simply by a specified schedule. Additionally, Audamo allows for the execution of custom scripts during theme changes, enabling users to hook up additional scripts into the theme toggle process.
 
-Until now, Audamo can set the following theme elements (`config.toml` values in brackets, see also [Configuration](#configuration)):
+Until now, Audamo can set the following theme elements (`config.toml` values in brackets; see also [Configuration](#configuration)):
 
 - GTK theme (`theme`)
 - Icon theme (`icon`)
 - Cursor theme (`cursor`)
 - GTK color-scheme preference
 
-A user specified script (`custom-script-path`) can be run with every theme change, allowing for additional customization, see also [Custom Script](#custom-script).
+A user specified script (`custom-script-path`) can be run with every theme change, allowing for additional customization; see also [Custom Script](#custom-script).
 
 </br>
 
@@ -30,7 +30,7 @@ bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/ins
 
 #### Dependencies
 
-Audamo requires the following python packages to be installed (see [requirements.txt](https://raw.githubusercontent.com/braun-steven/audamo/main/install.sh) for more specific versions):
+Audamo requires the following Python packages to be installed (see [requirements.txt](https://raw.githubusercontent.com/braun-steven/audamo/main/install.sh) for more specific versions):
 
 - `astral`
 - `requests`
@@ -72,7 +72,7 @@ audamo --daemon
 
 ### Manual
 
-Instead of using Audamo as a service/daemon, you can also run it manually with a single invocation. Based on the `config.toml` settings, this will update the theme to light/dark mode:
+Instead of using Audamo as a service/daemon, you can run it manually with a single invocation. Based on the `config.toml` settings, this will update the theme to light/dark mode:
 
 ``` bash
 $ audamo --help
@@ -134,13 +134,13 @@ cursor = "Adwaita"
 
 ## Custom Script
 
-A custom script can get executed with every time `audamo` is run. The script path can be configured in `config.toml` with the  `custom-script-path` variable. The script is run with a single argument which is either "light" or "dark". This script may contain user specified `sed` instructions to e.g. replace the vim theme like `sed -i s/colorscheme dark/colorscheme light/g ~/.vimrc` or similar. Make sure that the script has a proper shebang, e.g. `#!/bin/sh` for shell scripts.
+A custom script can get executed every time `audamo` is run. The script path can be configured in `config.toml` with the  `custom-script-path` variable. The script is run with a single argument which is either "light" or "dark". This script may contain user-specified `sed` instructions to replace the vim theme like `sed e.g. -i s/colorscheme dark/colorscheme light/g ~/.vimrc` or similar. Make sure that the script has a proper shebang, e.g. `#!/bin/sh` for shell scripts.
 
 An example script can be found in [`example-custom-script.sh`](example-custom-script.sh):
 
 ```bash
 #!/usr/bin/env sh
-# This script takes a single argument which can be either "light", or "dark".
+# This script takes a single argument, either "light" or "dark".
 
 THEME="$1"
 case $THEME in
@@ -192,17 +192,17 @@ bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/uni
 
 ### Version 1.1.2
 
-- Hot fix slip of syntax error
+- Hotfix slip of syntax error
 
 ### Version 1.1.1
 
-- Remove sleep until next sunrise/sunset as this was not compatible with suspending systems
+- Remove sleep until the next sunrise/sunset as this was not compatible with suspending systems
 
 ### Version 1.1.0
 
 - Add print config flag
-- Implement sleep until next sunrise/sunset
-- Fix theme detection when theme do not have an `index.theme` file
+- Implement sleep until the next sunrise/sunset
+- Fix theme detection when the theme does not have an `index.theme` file
 - Rewrite core logic
 - Get rid of timezonefinder dependency
 - Remove systemd timer and make the service start the daemon
