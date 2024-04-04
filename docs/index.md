@@ -144,14 +144,21 @@ An example script can be found in [`example-custom-script.sh`](example-custom-sc
 
 ```bash
 #!/usr/bin/env sh
+# This script takes a single argument which can be either "light", or "dark".
 
-# This is an example custom script that can be set as `custom-script-path` in the config file.
-
-if [ "$1" = "light" ]; then
-    echo "Custom script called in light mode!"
-elif [ "$1" = "dark" ]; then
-    echo "Custom script called in dark mode!"
-fi
+THEME="$1"
+case $THEME in
+    light)
+        swaymsg "output * bg ~/wallpaper-light.png fill"
+        ;;
+    dark)
+        swaymsg "output * bg ~/wallpaper-dark.png fill"
+        ;;
+    *)
+        echo "Invalid argument. Please use 'light' or 'dark'."
+        exit 1
+        ;;
+esac
 ```
 
 
