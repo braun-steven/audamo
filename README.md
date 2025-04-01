@@ -30,7 +30,7 @@ bash <(curl -s -L https://raw.githubusercontent.com/braun-steven/audamo/main/ins
 
 #### Dependencies
 
-Audamo requires the following Python packages to be installed (see [requirements.txt](https://raw.githubusercontent.com/braun-steven/audamo/main/install.sh) for more specific versions):
+Audamo requires the following Python packages to be installed (see [requirements.txt](https://raw.githubusercontent.com/braun-steven/audamo/main/requirements.txt) for more specific versions):
 
 - `astral`
 - `requests`
