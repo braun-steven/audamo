@@ -3,6 +3,7 @@ Description=Automatically switch GTK theme based on sunrise and sunset
 
 [Service]
 Type=simple
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin
 ExecStart=audamo --daemon
 
 [Install]
