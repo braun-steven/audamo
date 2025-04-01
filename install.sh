@@ -45,4 +45,3 @@ fi
 echo "Installing systemd service"
 mkdir -p ~/.config/systemd/user/
 cp audamo.service ~/.config/systemd/user/audamo.service
-sed -i "s|^ExecStart=audamo --daemon|ExecStart=%h/.local/bin/audamo --daemon|" "$HOME/.config/systemd/user/audamo.service"
